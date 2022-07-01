@@ -29,25 +29,10 @@ B = double(B);
 % B = B-1; % 11 (bin) -> 3 (dec)(hex)
 
 %save variable COLOR to a file in HEX format for the chip to read
-fileID = fopen ('pieg.txt', 'w');
-for i = 1:size(G(:), 1)-1
-    fprintf (fileID, '%x\n', G(i)); % COLOR (dec) -> print to file (hex)
+fileID = fopen ('pie.txt', 'w');
+for i = 1:size(G(:), 1)
+    fprintf (fileID, '%x%x%x\n', R(i),G(i),B(i)); % COLOR (dec) -> print to file (hex)
 end
-fprintf (fileID, '%x', G(size(G(:), 1))); % COLOR (dec) -> print to file (hex)
+%fprintf (fileID, '%x', G(size(G(:), 1))); % COLOR (dec) -> print to file (hex)
 fclose (fileID);
 
-%save variable COLOR to a file in HEX format for the chip to read
-fileID = fopen ('pieb.txt', 'w');
-for i = 1:size(B(:), 1)-1
-    fprintf (fileID, '%x\n', B(i)); % COLOR (dec) -> print to file (hex)
-end
-fprintf (fileID, '%x', B(size(B(:), 1))); % COLOR (dec) -> print to file (hex)
-fclose (fileID);
-
-%save variable COLOR to a file in HEX format for the chip to read
-fileID = fopen ('pier.txt', 'w');
-for i = 1:size(R(:), 1)-1
-    fprintf (fileID, '%x\n', R(i)); % COLOR (dec) -> print to file (hex)
-end
-fprintf (fileID, '%x', R(size(R(:), 1))); % COLOR (dec) -> print to file (hex)
-fclose (fileID);
