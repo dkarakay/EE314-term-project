@@ -1,11 +1,8 @@
 %read the image
-name = 'zafer';
-file_name = append(name,'.jpg')
-output = append(name,'.txt')
-
-I = imread(file_name);	
-
-I = imresize(I,[100,100]);
+name = 'blue_1';
+file_name = append(name,'jpeg')
+I = imread();	
+imshow(I);
 		
 %Extract RED, GREEN and BLUE components from the image
 R = I(:,:,1);			
@@ -40,7 +37,7 @@ B = bitshift(B, 6); % 6 << B (shift by 6 bits)
 COLOR = R+G+B;      % R + 3 << G + 6 << B
 
 %save variable COLOR to a file in HEX format for the chip to read
-fileID = fopen (output, 'w');
+fileID = fopen (append(name,'.txt'), 'w');
 for i = 1:size(COLOR(:), 1)-1
     fprintf (fileID, '%x\n', COLOR(i)); % COLOR (dec) -> print to file (hex)
 end
