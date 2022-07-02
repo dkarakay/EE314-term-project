@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY "Cyclone V"
 set_global_assignment -name DEVICE 5CSEMA5F31C6
-set_global_assignment -name TOP_LEVEL_ENTITY TopModuleS
+set_global_assignment -name TOP_LEVEL_ENTITY son
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 13.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "15:10:15  JUNE 29, 2022"
 set_global_assignment -name LAST_QUARTUS_VERSION 13.1
@@ -50,36 +50,12 @@ set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (Verilog)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_simulation
 set_global_assignment -name OPTIMIZATION_TECHNIQUE BALANCED
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS ON
-set_location_assignment PIN_B13 -to VGA_B[0] -disable
-set_location_assignment PIN_G13 -to VGA_B[1] -disable
-set_location_assignment PIN_H13 -to VGA_B[2] -disable
-set_location_assignment PIN_F14 -to VGA_B[3] -disable
-set_location_assignment PIN_H14 -to VGA_B[4] -disable
-set_location_assignment PIN_F15 -to VGA_B[5] -disable
-set_location_assignment PIN_G15 -to VGA_B[6] -disable
-set_location_assignment PIN_J14 -to VGA_B[7] -disable
-set_location_assignment PIN_A11 -to VGA_CLK
-set_location_assignment PIN_G10 -to VGA_G[3] -disable
-set_location_assignment PIN_G11 -to VGA_G[4] -disable
-set_location_assignment PIN_G12 -to VGA_G[5] -disable
-set_location_assignment PIN_F11 -to VGA_G[6] -disable
-set_location_assignment PIN_E11 -to VGA_G[7] -disable
-set_location_assignment PIN_B11 -to VGA_HS
-set_location_assignment PIN_A13 -to VGA_R[0] -disable
-set_location_assignment PIN_C13 -to VGA_R[1] -disable
-set_location_assignment PIN_E13 -to VGA_R[2] -disable
-set_location_assignment PIN_B12 -to VGA_R[3] -disable
-set_location_assignment PIN_C12 -to VGA_R[4] -disable
-set_location_assignment PIN_D12 -to VGA_R[5] -disable
-set_location_assignment PIN_E12 -to VGA_R[6] -disable
-set_location_assignment PIN_F13 -to VGA_R[7] -disable
-set_location_assignment PIN_D11 -to VGA_VS
-set_location_assignment PIN_AF14 -to CLOCK_50
+set_location_assignment PIN_A11 -to VGA_CLK -disable
+set_location_assignment PIN_B11 -to VGA_HS -disable
+set_location_assignment PIN_D11 -to VGA_VS -disable
+set_location_assignment PIN_AF14 -to CLOCK_50 -disable
 set_global_assignment -name VERILOG_FILE TopModuleS.v
 set_global_assignment -name VERILOG_FILE VGA_SyncS.v
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT FAST
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name SMART_RECOMPILE ON
@@ -89,22 +65,41 @@ set_global_assignment -name VERILOG_FILE FJO460AIFJWNPSH.v
 set_global_assignment -name VERILOG_FILE FT7VOG4IFJWNPSN.v
 set_global_assignment -name VERILOG_FILE FEO2UGZIFJWNPSJ.v
 set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform.vwf
-set_global_assignment -name EDA_NETLIST_WRITER_OUTPUT_DIR "C:/Users/OGAM/Desktop/proje/simulation/qsim/" -section_id eda_simulation
+set_global_assignment -name EDA_NETLIST_WRITER_OUTPUT_DIR "C:/Users/OGAM/Desktop/proje/quartus/simulation/qsim/" -section_id eda_simulation
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST ON -section_id eda_simulation
 set_global_assignment -name VERILOG_FILE Project8.v
-set_location_assignment PIN_E12 -to COLOR[1]
-set_location_assignment PIN_F13 -to COLOR[2]
-set_location_assignment PIN_G12 -to COLOR[3]
-set_location_assignment PIN_F11 -to COLOR[4]
-set_location_assignment PIN_E11 -to COLOR[5]
-set_location_assignment PIN_G15 -to COLOR[6]
-set_location_assignment PIN_J14 -to COLOR[7]
-set_location_assignment PIN_D12 -to COLOR[0]
-set_location_assignment PIN_J9 -to VGA_G[0] -disable
-set_location_assignment PIN_J10 -to VGA_G[1] -disable
-set_location_assignment PIN_H12 -to VGA_G[2] -disable
-set_location_assignment PIN_AC12 -to swb
-set_location_assignment PIN_AB12 -to swa
-set_location_assignment PIN_AF10 -to swd
-set_location_assignment PIN_AF9 -to swc
+set_location_assignment PIN_E12 -to COLOR[1] -disable
+set_location_assignment PIN_F13 -to COLOR[2] -disable
+set_location_assignment PIN_G12 -to COLOR[3] -disable
+set_location_assignment PIN_F11 -to COLOR[4] -disable
+set_location_assignment PIN_E11 -to COLOR[5] -disable
+set_location_assignment PIN_G15 -to COLOR[6] -disable
+set_location_assignment PIN_J14 -to COLOR[7] -disable
+set_location_assignment PIN_D12 -to COLOR[0] -disable
+set_location_assignment PIN_AC12 -to swb -disable
+set_location_assignment PIN_AB12 -to swa -disable
+set_location_assignment PIN_AF10 -to swd -disable
+set_location_assignment PIN_AF9 -to swc -disable
+set_global_assignment -name VERILOG_FILE son.v
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_location_assignment PIN_W15 -to btn1
+set_location_assignment PIN_AA14 -to btnStart
+set_location_assignment PIN_AF14 -to clk
+set_location_assignment PIN_V16 -to registeredbin[0] -disable
+set_location_assignment PIN_W16 -to registeredbin[1] -disable
+set_location_assignment PIN_V17 -to registeredbin[2] -disable
+set_location_assignment PIN_V18 -to registeredbin[3] -disable
+set_location_assignment PIN_AA15 -to btn0
+set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform1.vwf
+set_location_assignment PIN_W16 -to buffer1[1]
+set_location_assignment PIN_V17 -to buffer1[2]
+set_location_assignment PIN_V18 -to buffer1[3]
+set_location_assignment PIN_W17 -to buffer1[4]
+set_location_assignment PIN_W19 -to buffer1[5]
+set_location_assignment PIN_Y19 -to buffer1[6]
+set_location_assignment PIN_W20 -to buffer1[7]
+set_location_assignment PIN_W21 -to buffer1[8]
+set_location_assignment PIN_V16 -to buffer1[0]
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
