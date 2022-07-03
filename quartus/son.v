@@ -8,7 +8,7 @@ input btn1;
 reg [3:0] dummy;
 
 reg pressed;
-integer isStartPressed,isBtn0Pressed,isBtn1Pressed;
+integer isStartPressed;
 integer checkFourValue;
 
 integer indexb1, indexb2, indexb3,indexb4;
@@ -81,29 +81,9 @@ always @ (posedge clk) begin
 			
 			// 1st Buffer
 			2'b00:begin
-				case({inputReg[1],inputReg[0]})
-					2'b00:	begin
-					buffer1[indexb1+1] = 0;
-					buffer1[indexb1+2] = 0;
-					end
-					
-					2'b01:	begin
-					buffer1[indexb1+1] = 0;
-					buffer1[indexb1+2] = 1;
-					end
-
-					2'b10:	begin
-					buffer1[indexb1+1] = 1;
-					buffer1[indexb1+2] = 0;
-					end
-					
-					2'b11:	begin
-					buffer1[indexb1+1] = 1;
-					buffer1[indexb1+2] = 1;
-					end
-				endcase
-				buffer1[indexb1] = 1;
-				indexb1 = indexb1 +3;
+				buffer1[17:3]=buffer1[14:0];
+				buffer1[2:0] = {inputReg[1:0],1'b0};
+				//indexb1 = indexb1 +3;
 			end
 			
 			// 2nd Buffer
