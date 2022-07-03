@@ -31,12 +31,12 @@ reg[7:0] red0[0:899];
 reg[7:0] red1[0:899];
 reg[7:0] red2[0:899];
 reg[7:0] red3[0:899];
-/*
+
 reg[7:0] purple0[0:899];
 reg[7:0] purple1[0:899];
 reg[7:0] purple2[0:899];
 reg[7:0] purple3[0:899];
-*/
+
 
 parameter bPosX1 = 200;
 parameter bPosX2 = 260;
@@ -102,12 +102,12 @@ $readmemh("red0.txt", red0);
 $readmemh("red1.txt", red1);
 $readmemh("red2.txt", red2);
 $readmemh("red3.txt", red3);
-/*
+
 $readmemh("purple0.txt", purple0);
 $readmemh("purple1.txt", purple1);
 $readmemh("purple2.txt", purple2);
 $readmemh("purple3.txt", purple3);
-*/
+
 
 end
 always @(posedge CLOCK_50) begin 
@@ -420,7 +420,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else color_i <= 8'h0;
 	end
-	/*
+	
 	// 4th Buffer Purple
 	else if(pos_H>=bPosX4 && pos_H<bPosX4+s)begin
 		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
