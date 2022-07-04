@@ -1,11 +1,11 @@
 %read the image
-name = 'transmitted';
-file_name = append(name,'.jpg')
+name = 'droppedYellow';
+file_name = append(name,'.jpeg')
 output = append(name,'.txt')
 
 I = imread(file_name);
 size(I)
-I = imresize(I,[30,60]);
+I = imresize(I,[40,80]);
 size(I)
 
 %Extract RED, GREEN and BLUE components from the image
