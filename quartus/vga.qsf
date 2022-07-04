@@ -87,16 +87,22 @@ set_location_assignment PIN_A11 -to VGA_CLK
 set_location_assignment PIN_B11 -to VGA_HS
 set_location_assignment PIN_D11 -to VGA_VS
 set_location_assignment PIN_AB12 -to swa
+set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform2.vwf
+set_location_assignment PIN_W16 -to outputReg[1] -disable
+set_location_assignment PIN_V17 -to outputReg[2] -disable
+set_location_assignment PIN_V18 -to outputReg[3] -disable
+set_location_assignment PIN_W19 -to inputReg[1] -disable
+set_location_assignment PIN_Y19 -to inputReg[2] -disable
+set_location_assignment PIN_W20 -to inputReg[3] -disable
+set_location_assignment PIN_W17 -to inputReg[0] -disable
+set_location_assignment PIN_V16 -to readCountBuffer1[0]
+set_location_assignment PIN_W16 -to readCountBuffer1[1]
+set_location_assignment PIN_V17 -to readCountBuffer1[2]
+set_location_assignment PIN_V18 -to readCountBuffer1[3]
+set_location_assignment PIN_W17 -to readCountBuffer1[4]
+set_global_assignment -name VERILOG_FILE bin2bcd.v
+set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform3.vwf
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform2.vwf
-set_location_assignment PIN_W16 -to outputReg[1]
-set_location_assignment PIN_V17 -to outputReg[2]
-set_location_assignment PIN_V18 -to outputReg[3]
-set_location_assignment PIN_V16 -to outputReg[0]
-set_location_assignment PIN_W19 -to inputReg[1]
-set_location_assignment PIN_Y19 -to inputReg[2]
-set_location_assignment PIN_W20 -to inputReg[3]
-set_location_assignment PIN_W17 -to inputReg[0]
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
