@@ -229,7 +229,7 @@ always @ (posedge CLOCK_50) begin
 	if(swa)readNow = readNow+1;
 	else readNow = 0;
 	
-	if(readNow == 75000000 && swa)begin
+	if(readNow == 150000000 && swa)begin
 	//if(readNow == 60)begin
 		outputReg <= 0;
 		
@@ -317,15 +317,16 @@ always @ (posedge CLOCK_50) begin
 
 	end
 	
+	// Take input
 	else if (btnStart == 0 && isStartPressed <2) begin
-		inputReg <=0;
+		inputReg=5'b00000;
 		isStartPressed <= isStartPressed+1;
 	end
 	
 	else if (isStartPressed == 2) begin
-
 		case ({btn0,btn1,pressed}) 
 		
+		// No button is pressed
 		3'b111 : begin
 		pressed <= 0 ;
 		end
@@ -363,37 +364,40 @@ always @ (posedge CLOCK_50) begin
 		end
 		endcase		
 	
+		// If 4 bits are done
 		if (inputReg[4] == 1)begin
 			case(inputReg[3:2])
-				// 1st Buffer
+				// 1st Buffer write
 				2'b00:begin
 					buffer1[17:3]=buffer1[14:0];
 					buffer1[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff1 <= sizeBuff1 +1;
 				end
 				
-				// 2nd Buffer
+				// 2nd Buffer write
 				2'b01:begin
 					buffer2[17:3]=buffer2[14:0];
 					buffer2[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff2 <= sizeBuff2 +1;
 				end
 				
-				// 3rd Buffer
+				// 3rd Buffer write
 				2'b10:begin
 					buffer3[17:3]=buffer3[14:0];
 					buffer3[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff3 <= sizeBuff3 +1;
 				end
 				
-				// 4th Buffer
+				// 4th Buffer write
 				2'b11:begin
 					buffer4[17:3]=buffer4[14:0];
 					buffer4[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff4 <= sizeBuff4 +1;
 				end
 			endcase
-			end
+			
+			inputReg=5'b00000;
+		end
 	end 
 	
 end	
@@ -840,7 +844,7 @@ always @(posedge VGA_CLK) begin
 	else if(pos_H>=bPosX4 && pos_H<bPosX4+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
 		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
 		  if(buffer4[15])begin
-				case({buffer4[16],buffer4[17]})
+				case(buffer4[17:16])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
@@ -851,7 +855,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY2 && pos_V<bPosY2+s) begin
 			if(buffer4[12])begin
-				case({buffer4[13],buffer4[14]})
+				case(buffer4[14:13])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
@@ -862,7 +866,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY3 && pos_V<bPosY3+s) begin
 			if(buffer4[9])begin
-				case({buffer4[10],buffer4[11]})
+				case(buffer4[11:10])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
@@ -873,7 +877,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY4 && pos_V<bPosY4+s) begin
 			if(buffer4[6])begin
-			case({buffer4[7],buffer4[8]})
+				case(buffer4[8:7])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
@@ -884,7 +888,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY5 && pos_V<bPosY5+s) begin
 			if(buffer4[3])begin
-				case({buffer4[4],buffer4[5]})
+				case(buffer4[5:4])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
@@ -895,7 +899,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY6 && pos_V<bPosY6+s) begin
 			if(buffer4[0])begin
-				case({buffer4[1],buffer4[2]})
+				case(buffer4[2:1])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
