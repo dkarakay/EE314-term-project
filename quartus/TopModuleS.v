@@ -66,9 +66,10 @@ reg[7:0] numberBlank[0:359];
 
 
 // transmitted 60x30
-//reg[7:0] textTransmitted[0:1799];
+reg[7:0] textTransmitted[0:3199];
 reg[7:0] textInput[0:1799];
 reg[7:0] textRead[0:1799];
+reg[7:0] textBuffer1[0:799];
 
 
 
@@ -112,6 +113,28 @@ parameter b1Reliability = 1;
 parameter b2Reliability = 2;
 parameter b3Reliability = 3;
 parameter b4Reliability = 4;
+
+parameter bPosTextLargeY1 = 100;
+parameter bPosTextLargeY2 = 250;
+parameter bPosTextLargeY3 = 400;
+parameter bPosTextLargeX = 600;
+parameter sTextLargeY = 40;
+parameter sTextLargeX = 80;
+parameter sTextBufferY = 20;
+parameter sTextBufferX = 40;
+
+
+parameter bPosTextBuffer1X = 530;
+parameter bPosTextBuffer2X = 575;
+parameter bPosTextBuffer3X = 620;
+parameter bPosTextBuffer4X = 665;
+parameter bPosTextBuffer5X = 710;
+
+parameter bPosTextBuffer1Y = 150;
+parameter bPosTextBuffer2Y = 300;
+parameter bPosTextBuffer3Y = 450;
+
+
 
 reg [4:0] score1, score2, score3,score4;
 reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
@@ -174,6 +197,10 @@ $readmemh("ui/buffer/blue3.txt", blue3);
 
 $readmemh("ui/text/input.txt", textInput);
 $readmemh("ui/text/read.txt", textRead);
+
+$readmemh("ui/text/transmitted.txt", textTransmitted);
+$readmemh("ui/text/buffer1.txt", textBuffer1);
+
 //$readmemh("transmitted.txt", textTransmitted);
 /*
 
@@ -194,12 +221,12 @@ $readmemh("ui/buffer/purple2.txt", purple2);
 $readmemh("ui/buffer/purple3.txt", purple3);
 */
 
-
+/*
 $readmemh("ui/buffer/b1.txt", b1);
 $readmemh("ui/buffer/b2.txt", b2);
 $readmemh("ui/buffer/b3.txt", b3);
 $readmemh("ui/buffer/b4.txt", b4);
-
+*/
 
 
 
@@ -232,8 +259,8 @@ always @ (posedge CLOCK_50) begin
 	if(swa)readNow = readNow+1;
 	else readNow = 0;
 	
-	//if(readNow == 75000000 && swa)begin
-	if(readNow == 60 && swa)begin
+	if(readNow == 75000000 && swa)begin
+	//if(readNow == 60 && swa)begin
 		outputReg <= 0;
 		
 		if(sizeBuff1 == 0) score1<=0;
@@ -244,10 +271,10 @@ always @ (posedge CLOCK_50) begin
 		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
 			
 			read1 <= read1 +1;
-			if(sizeBuff1 > 0) score1 <= sizeBuff1 <=  3 ?  sizeBuff1*b1Latency+b1Reliability: sizeBuff1*b1Reliability+b1Latency; 		
-			if(sizeBuff2 > 0) score2 <= sizeBuff2 <=  3 ?  sizeBuff2*b2Latency+b2Reliability: sizeBuff2*b2Reliability+b2Latency;
-			if(sizeBuff3 > 0) score3 <= sizeBuff3 <=  3 ?  sizeBuff3*b3Latency+b3Reliability: sizeBuff3*b3Reliability+b3Latency;
-			if(sizeBuff4 > 0) score4 <= sizeBuff4 <=  3 ?  sizeBuff4*b4Latency+b4Reliability: sizeBuff4*b4Reliability+b4Latency;
+			if(sizeBuff1 > 0) score1 <= sizeBuff1 <=  3 ?  2*sizeBuff1*b1Latency+b1Reliability: 2*sizeBuff1*b1Reliability+b1Latency; 		
+			if(sizeBuff2 > 0) score2 <= sizeBuff2 <=  3 ?  2*sizeBuff2*b2Latency+b2Reliability: 2*sizeBuff2*b2Reliability+b2Latency;
+			if(sizeBuff3 > 0) score3 <= sizeBuff3 <=  3 ?  2*sizeBuff3*b3Latency+b3Reliability: 2*sizeBuff3*b3Reliability+b3Latency;
+			if(sizeBuff4 > 0) score4 <= sizeBuff4 <=  3 ?  2*sizeBuff4*b4Latency+b4Reliability: 2*sizeBuff4*b4Reliability+b4Latency;
 			
 			
 			// Read from Buffer 1
@@ -1021,13 +1048,97 @@ always @(posedge VGA_CLK) begin
 		
 		else color_i <= 8'h0;
 	end
-	// Transmitted Buffer1 Reg
-   /*else if (pos_V>=bPosTransmittedY && pos_V<bPosTransmittedY+sizeYNumber && pos_H>=bPosTransmittedX1 && pos_H<bPosTransmittedX2+sizeXNumber)begin
-		if(pos_H>=bPosTransmittedX1 && pos_H<bPosTransmittedX1+sizeXNumber)begin
-				
-	
+	// Transmitted Reg
+   else if (pos_H>=bPosTextLargeX && pos_H<bPosTextLargeX+sTextLargeX && pos_V>=bPosTextLargeY1 && pos_V<bPosTextLargeY1+sTextLargeY)begin
+		color_i <= textTransmitted[{(pos_H-bPosTextLargeX)*sTextLargeY+pos_V-bPosTextLargeY1}];
 	end
-	*/
+	
+		// Buffer1 Text Reg
+		else if (pos_H>=bPosTextBuffer1X && pos_H<bPosTextBuffer1X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer1X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+		end
+			
+		// Buffer2 Text Reg
+		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+		end
+		
+		// Buffer3 Text Reg
+		else if (pos_H>=bPosTextBuffer3X && pos_H<bPosTextBuffer3X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+		end
+		
+		// Buffer4 Text Reg	
+		else if (pos_H>=bPosTextBuffer4X && pos_H<bPosTextBuffer4X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+		end
+		
+		// Buffer5 Text Reg
+		else if (pos_H>=bPosTextBuffer5X && pos_H<bPosTextBuffer5X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+		end
+	
+	// Received Reg
+	else if (pos_H>=bPosTextLargeX && pos_H<bPosTextLargeX+sTextLargeX && pos_V>=bPosTextLargeY2 && pos_V<bPosTextLargeY2+sTextLargeY)begin
+		color_i <= textTransmitted[{(pos_H-bPosTextLargeX)*sTextLargeY+pos_V-bPosTextLargeY2}];
+	end
+	
+		// Buffer1 Text Reg
+		else if (pos_H>=bPosTextBuffer1X && pos_H<bPosTextBuffer1X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer1X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+		end
+			
+		// Buffer2 Text Reg
+		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+		end
+		
+		// Buffer3 Text Reg
+		else if (pos_H>=bPosTextBuffer3X && pos_H<bPosTextBuffer3X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+		end
+		
+		// Buffer4 Text Reg	
+		else if (pos_H>=bPosTextBuffer4X && pos_H<bPosTextBuffer4X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+		end
+		
+		// Buffer5 Text Reg
+		else if (pos_H>=bPosTextBuffer5X && pos_H<bPosTextBuffer5X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+		end
+	
+	// Received Reg
+	else if (pos_H>=bPosTextLargeX && pos_H<bPosTextLargeX+sTextLargeX && pos_V>=bPosTextLargeY3 && pos_V<bPosTextLargeY3+sTextLargeY)begin
+		color_i <= textTransmitted[{(pos_H-bPosTextLargeX)*sTextLargeY+pos_V-bPosTextLargeY3}];
+	end
+	
+		// Buffer1 Text Reg
+		else if (pos_H>=bPosTextBuffer1X && pos_H<bPosTextBuffer1X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer1X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+		end
+			
+		// Buffer2 Text Reg
+		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+		end
+		
+		// Buffer3 Text Reg
+		else if (pos_H>=bPosTextBuffer3X && pos_H<bPosTextBuffer3X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+		end
+		
+		// Buffer4 Text Reg	
+		else if (pos_H>=bPosTextBuffer4X && pos_H<bPosTextBuffer4X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+		end
+		
+		// Buffer5 Text Reg
+		else if (pos_H>=bPosTextBuffer5X && pos_H<bPosTextBuffer5X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
+			color_i <= textBuffer1[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+		end
+	
+	
 	else begin
 	color_i <= 8'h0;
 	end
