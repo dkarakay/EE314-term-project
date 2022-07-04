@@ -1,6 +1,7 @@
 module TopModuleS(
 CLOCK_50, VGA_VS, VGA_HS, VGA_CLK,COLOR,led1,
-buffer1,buffer2,buffer3,buffer4,inputReg,btnStart,btn0,btn1
+buffer1,buffer2,buffer3,buffer4,inputReg,btnStart,btn0,btn1,
+score1,score2,score3,score4,read1,sizeBuff1,sizeBuff2,sizeBuff3,sizeBuff4
 
 );
 
@@ -15,13 +16,14 @@ reg [7:0] color_i;
 wire READY;
 wire[9:0] pos_H, pos_V;
 
+// 30x30
 reg[7:0] blank[0:899];
 
 reg[7:0] blue0[0:899];
 reg[7:0] blue1[0:899];
 reg[7:0] blue2[0:899];
 reg[7:0] blue3[0:899];
-
+/*
 reg[7:0] green0[0:899];
 reg[7:0] green1[0:899];
 reg[7:0] green2[0:899];
@@ -36,6 +38,34 @@ reg[7:0] purple0[0:899];
 reg[7:0] purple1[0:899];
 reg[7:0] purple2[0:899];
 reg[7:0] purple3[0:899];
+
+/*
+reg[7:0] b1[0:899]; // 30x30
+reg[7:0] b2[0:899];
+reg[7:0] b3[0:899];
+reg[7:0] b4[0:899];
+
+reg[7:0] names[0:1799]; // 90x20
+*/
+
+/*
+// 24x15
+reg[7:0] number0[0:359]; 
+reg[7:0] number1[0:359];
+reg[7:0] number2[0:359];
+reg[7:0] number3[0:359];
+reg[7:0] number4[0:359];
+reg[7:0] number5[0:359];
+reg[7:0] number6[0:359];
+reg[7:0] number7[0:359];
+reg[7:0] number8[0:359];
+reg[7:0] number9[0:359];
+
+*/
+// transmitted 60x30
+//reg[7:0] textTransmitted[0:1799];
+//reg[7:0] textInput[0:1799];
+
 
 
 parameter bPosX1 = 200;
@@ -53,8 +83,20 @@ parameter bPosY6 = 350;
 
 parameter s=30;
 
+parameter b1Latency = 4;
+parameter b2Latency = 3;
+parameter b3Latency = 2;
+parameter b4Latency = 1;
 
-integer indexb1, indexb2, indexb3,indexb4;
+parameter b1Reliability = 1;
+parameter b2Reliability = 2;
+parameter b3Reliability = 3;
+parameter b4Reliability = 4;
+
+output reg [4:0] score1, score2, score3,score4,read1;
+output reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
+//integer sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
+ 
 output reg [4:0] inputReg;
 output reg [18:0] buffer1, buffer2, buffer3, buffer4;
 input btnStart;
@@ -62,22 +104,33 @@ input btn0;
 input btn1;
 reg [3:0] dummy;
 reg pressed;
+
+
 integer isStartPressed;
 integer checkFourValue;
-
 integer data_read;
 
+integer readNow;
 
 initial begin
+score1=0;
+score2=0;
+score3=0;
+score4=0;
+
+
 inputReg <=0;
 dummy <= 0;
+
 pressed = 0;
 isStartPressed = 0;
 checkFourValue = 0;
-indexb1 =0;
-indexb2 =0;
-indexb3 =0;
-indexb4 =0;
+
+sizeBuff1 =0;
+sizeBuff2 =0;
+sizeBuff3 =0;
+sizeBuff4 =0;
+
 data_read=0;
 
 buffer1 <=0;
@@ -85,30 +138,56 @@ buffer2 <=0;
 buffer3 <=0;
 buffer4 <=0;
 
+readNow=0;
 
-$readmemh("blank.txt", blank);
-
-$readmemh("blue0.txt", blue0);
-$readmemh("blue1.txt", blue1);
-$readmemh("blue2.txt", blue2);
-$readmemh("blue3.txt", blue3);
-
-$readmemh("green0.txt", green0);
-$readmemh("green1.txt", green1);
-$readmemh("green2.txt", green2);
-$readmemh("green3.txt", green3);
-
-$readmemh("red0.txt", red0);
-$readmemh("red1.txt", red1);
-$readmemh("red2.txt", red2);
-$readmemh("red3.txt", red3);
-
-$readmemh("purple0.txt", purple0);
-$readmemh("purple1.txt", purple1);
-$readmemh("purple2.txt", purple2);
-$readmemh("purple3.txt", purple3);
+$readmemh("ui/buffer/blank.txt", blank);
+$readmemh("ui/buffer/blue0.txt", blue0);
+$readmemh("ui/buffer/blue1.txt", blue1);
+$readmemh("ui/buffer/blue2.txt", blue2);
+$readmemh("ui/buffer/blue3.txt", blue3);
 
 
+//$readmemh("input.txt", textInput);
+//$readmemh("transmitted.txt", textTransmitted);
+
+
+/*
+$readmemh("ui/buffer/green0.txt", green0);
+$readmemh("ui/buffer/green1.txt", green1);
+$readmemh("ui/buffer/green2.txt", green2);
+$readmemh("ui/buffer/green3.txt", green3);
+
+$readmemh("ui/buffer/red0.txt", red0);
+$readmemh("ui/buffer/red1.txt", red1);
+$readmemh("ui/buffer/red2.txt", red2);
+$readmemh("ui/buffer/red3.txt", red3);
+
+$readmemh("ui/buffer/purple0.txt", purple0);
+$readmemh("ui/buffer/purple1.txt", purple1);
+$readmemh("ui/buffer/purple2.txt", purple2);
+$readmemh("ui/buffer/purple3.txt", purple3);
+*/
+
+/*
+$readmemh("ui/buffer/b1.txt", b1);
+$readmemh("ui/buffer/b2.txt", b2);
+$readmemh("ui/buffer/b3.txt", b3);
+$readmemh("ui/buffer/b4.txt", b4);
+
+*/
+
+/*
+$readmemh("ui/numbers/number0.txt", number0);
+$readmemh("ui/numbers/number1.txt", number1);
+$readmemh("ui/numbers/number2.txt", number2);
+$readmemh("ui/numbers/number3.txt", number3);
+$readmemh("ui/numbers/number4.txt", number4);
+$readmemh("ui/numbers/number5.txt", number5);
+$readmemh("ui/numbers/number6.txt", number6);
+$readmemh("ui/numbers/number7.txt", number7);
+$readmemh("ui/numbers/number8.txt", number8);
+$readmemh("ui/numbers/number9.txt", number9);
+*/
 end
 always @(posedge CLOCK_50) begin 
 	VGA_CLK = ~VGA_CLK;
@@ -120,7 +199,31 @@ VGA_SyncS SYNC(.vga_CLK(VGA_CLK), .VSync(VGA_VS), .HSync(VGA_HS), .vga_Ready(REA
 
 always @ (posedge CLOCK_50) begin
 
-	if (btnStart == 0 && isStartPressed <2) begin
+	readNow = readNow+1;
+
+	if(readNow == 60)begin
+		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
+
+	//else if(readNow == 75000000)begin
+		read1 <= read1 +1;
+		if(sizeBuff1 > 0) score1 <= sizeBuff1 <=  3 ?  sizeBuff1*b1Latency+b1Reliability: sizeBuff1*b1Reliability+b1Latency; 		
+		if(sizeBuff2 > 0) score2 <= sizeBuff2 <=  3 ?  sizeBuff2*b2Latency+b2Reliability: sizeBuff2*b2Reliability+b2Latency;
+		if(sizeBuff3 > 0) score3 <= sizeBuff3 <=  3 ?  sizeBuff3*b3Latency+b3Reliability: sizeBuff3*b3Reliability+b3Latency;
+		if(sizeBuff4 > 0) score4 <= sizeBuff4 <=  3 ?  sizeBuff4*b4Latency+b4Reliability: sizeBuff4*b4Reliability+b4Latency;
+		
+		if(score1 >= score2 && score1 >= score3 && score1 >= score4) begin
+			buffer1[(sizeBuff1-1)*3]<=0;
+ 			buffer1[(sizeBuff1-1)*3+1]<=0;
+ 			buffer1[(sizeBuff1-1)*3+2]<=0;
+			sizeBuff1 = sizeBuff1-1;
+		end
+		 
+		end
+		readNow <= 0;
+
+	end
+	
+	else if (btnStart == 0 && isStartPressed <2) begin
 		inputReg <=0;
 		isStartPressed <= isStartPressed+1;
 	end
@@ -172,32 +275,32 @@ always @ (posedge CLOCK_50) begin
 			2'b00:begin
 				buffer1[17:3]=buffer1[14:0];
 				buffer1[2:0] = {inputReg[1:0],1'b1};
-				indexb1 = indexb1 +3;
+				sizeBuff1 <= sizeBuff1 +1;
 			end
 			
 			// 2nd Buffer
 			2'b01:begin
 				buffer2[17:3]=buffer2[14:0];
 				buffer2[2:0] = {inputReg[1:0],1'b1};
-				indexb2 = indexb2 +3;
+				sizeBuff2 <= sizeBuff2 +1;
 			end
 			
 			// 3rd Buffer
 			2'b10:begin
 				buffer3[17:3]=buffer3[14:0];
 				buffer3[2:0] = {inputReg[1:0],1'b1};
-				indexb3 = indexb3 +3;
+				sizeBuff3 <= sizeBuff3 +1;
 			end
 			
 			// 4th Buffer
 			2'b11:begin
 				buffer4[17:3]=buffer4[14:0];
 				buffer4[2:0] = {inputReg[1:0],1'b1};
-				indexb4 = indexb4 +3;
+				sizeBuff4 <= sizeBuff4 +1;
 			end
 		endcase
 		end
-	end
+	end 
 	
 end	
 
@@ -205,6 +308,7 @@ end
 
 
 always @(posedge VGA_CLK) begin 	
+	
 	
 	
 	// 1st Buffer
@@ -277,7 +381,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else color_i <= 8'h0;
 	end
-	
+	/*
 		// 2nd Buffer Green
 	else if(pos_H>=bPosX2 && pos_H<bPosX2+s)begin
 		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
@@ -706,6 +810,19 @@ always @(posedge VGA_CLK) begin
 		else color_i <= 8'h0;
 	end
 */
+	/*
+	else if(pos_H>=300 && pos_H<360 && pos_V>=80 && pos_V<110)begin
+		color_i <= textInput[{(pos_H-300)*30+pos_V-80}];
+	end
+	
+	else if(pos_H>=400 && pos_H<460 && pos_V>=80 && pos_V<110)begin
+		color_i <= textTransmitted[{(pos_H-400)*30+pos_V-80}];
+	end
+	*/
+	
+	
+	
+	
 	else begin
 			   color_i <= 8'h0;
 	end
