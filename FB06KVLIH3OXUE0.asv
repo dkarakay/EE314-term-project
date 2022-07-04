@@ -1,9 +1,12 @@
 %read the image
-name = 'blue_1';
-file_name = append(name,'jpeg')
-I = imread();	
+name = 'out0';
+file_name = append(name,'.jpg')
+output = append(name,'.txt')
+
+I = imread(file_name);
+I= imsi
 imshow(I);
-		
+
 %Extract RED, GREEN and BLUE components from the image
 R = I(:,:,1);			
 G = I(:,:,2);
@@ -37,7 +40,7 @@ B = bitshift(B, 6); % 6 << B (shift by 6 bits)
 COLOR = R+G+B;      % R + 3 << G + 6 << B
 
 %save variable COLOR to a file in HEX format for the chip to read
-fileID = fopen (append(name,'.txt'), 'w');
+fileID = fopen (output, 'w');
 for i = 1:size(COLOR(:), 1)-1
     fprintf (fileID, '%x\n', COLOR(i)); % COLOR (dec) -> print to file (hex)
 end

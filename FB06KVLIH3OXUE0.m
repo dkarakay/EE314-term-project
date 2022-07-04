@@ -1,12 +1,13 @@
 %read the image
-name = 'zafer';
+name = 'transmitted';
 file_name = append(name,'.jpg')
 output = append(name,'.txt')
 
-I = imread(file_name);	
+I = imread(file_name);
+size(I)
+I = imresize(I,[30,60]);
+size(I)
 
-I = imresize(I,[100,100]);
-		
 %Extract RED, GREEN and BLUE components from the image
 R = I(:,:,1);			
 G = I(:,:,2);
@@ -16,6 +17,7 @@ B = I(:,:,3);
 R = double(R);	
 G = double(G);
 B = double(B);
+
 
 size(R,1)*size(R,2)
 
