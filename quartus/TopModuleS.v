@@ -1,11 +1,10 @@
 module TopModuleS(
-CLOCK_50, VGA_VS, VGA_HS, VGA_CLK,COLOR,led1,
-buffer1,buffer2,buffer3,buffer4,inputReg,btnStart,btn0,btn1,swa,
-outputReg,
+CLOCK_50, VGA_VS, VGA_HS, VGA_CLK,COLOR,
+buffer1,buffer2,buffer3,buffer4,inputShow,btnStart,btn0,btn1,swa,
+outputReg, readCountBuffer1,read1,readCount1BCD
 );
 
 input CLOCK_50;
-output reg [7:0] led1;
 output VGA_HS, VGA_VS; 
 output reg VGA_CLK=0;
 output wire [7:0]COLOR;
@@ -38,13 +37,13 @@ reg[7:0] purple0[0:899];
 reg[7:0] purple1[0:899];
 reg[7:0] purple2[0:899];
 reg[7:0] purple3[0:899];
+*/
 
-/*
 reg[7:0] b1[0:899]; // 30x30
 reg[7:0] b2[0:899];
 reg[7:0] b3[0:899];
 reg[7:0] b4[0:899];
-
+/*
 reg[7:0] names[0:1799]; // 90x20
 */
 
@@ -114,11 +113,12 @@ parameter b2Reliability = 2;
 parameter b3Reliability = 3;
 parameter b4Reliability = 4;
 
-reg [4:0] score1, score2, score3,score4,read1;
+reg [4:0] score1, score2, score3,score4;
 reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
  
-output reg [4:0] inputReg;
-output reg [4:0] outputReg;
+reg [4:0] inputReg;
+output reg [4:0] inputShow;
+output reg [4:0] outputReg,read1;
 
 output reg [18:0] buffer1, buffer2, buffer3, buffer4;
 input btnStart,btn0,btn1,swa;
@@ -132,8 +132,8 @@ integer checkFourValue;
 integer data_read;
 integer readNow;
 
-//reg [4:0] readCountBuffer1, readCountBuffer2, readCountBuffer3, readCountBuffer4;
-
+output reg [13:0] readCountBuffer1;//, readCountBuffer2, readCountBuffer3, readCountBuffer4;
+output wire [15:0] readCount1BCD;
 
 initial begin
 score1=0;
@@ -143,6 +143,8 @@ score4=0;
 
 
 inputReg <=0;
+inputShow <=0;
+
 dummy <= 0;
 
 pressed = 0;
@@ -192,13 +194,13 @@ $readmemh("ui/buffer/purple2.txt", purple2);
 $readmemh("ui/buffer/purple3.txt", purple3);
 */
 
-/*
+
 $readmemh("ui/buffer/b1.txt", b1);
 $readmemh("ui/buffer/b2.txt", b2);
 $readmemh("ui/buffer/b3.txt", b3);
 $readmemh("ui/buffer/b4.txt", b4);
 
-*/
+
 
 
 $readmemh("ui/numbers/number0.txt", number0);
@@ -223,14 +225,15 @@ end
 
 VGA_SyncS SYNC(.vga_CLK(VGA_CLK), .VSync(VGA_VS), .HSync(VGA_HS), .vga_Ready(READY), .pos_H(pos_H), .pos_V(pos_V));
 
+bin2bcd bcdf(.bin(readCountBuffer1), .bcd(readCount1BCD));
 
 
 always @ (posedge CLOCK_50) begin
 	if(swa)readNow = readNow+1;
 	else readNow = 0;
 	
-	if(readNow == 75000000 && swa)begin
-	//if(readNow == 60)begin
+	//if(readNow == 75000000 && swa)begin
+	if(readNow == 60 && swa)begin
 		outputReg <= 0;
 		
 		if(sizeBuff1 == 0) score1<=0;
@@ -247,21 +250,21 @@ always @ (posedge CLOCK_50) begin
 			if(sizeBuff4 > 0) score4 <= sizeBuff4 <=  3 ?  sizeBuff4*b4Latency+b4Reliability: sizeBuff4*b4Reliability+b4Latency;
 			
 			
-			
 			// Read from Buffer 1
 			if(score1 >= score2 && score1 >= score3 && score1 >= score4) begin
 				outputReg[4] <= 1;
 				outputReg[3] <= 0;
 				outputReg[2] <= 0;
-				outputReg[1] <= buffer1[(sizeBuff1-1)*3+1];
-				outputReg[0] <= buffer1[(sizeBuff1-1)*3+2];
+				outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
+				outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
 			
 				buffer1[(sizeBuff1-1)*3]<=0;
 				buffer1[(sizeBuff1-1)*3+1]<=0;
 				buffer1[(sizeBuff1-1)*3+2]<=0;
 				sizeBuff1 = sizeBuff1-1;
 				
-				//readCountBuffer1 <= readCountBuffer1 +1;
+				readCountBuffer1 <= readCountBuffer1 +1;
+
 			end
 			
 			// Read from Buffer 4
@@ -269,8 +272,8 @@ always @ (posedge CLOCK_50) begin
 				outputReg[4] <= 1;
 				outputReg[3] <= 1;
 				outputReg[2] <= 1;
-				outputReg[1] <= buffer4[(sizeBuff4-1)*3+1];
-				outputReg[0] <= buffer4[(sizeBuff4-1)*3+2];
+				outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
+				outputReg[0] <= buffer4[(sizeBuff4-1)*3+1];
 			
 				buffer4[(sizeBuff4-1)*3]<=0;
 				buffer4[(sizeBuff4-1)*3+1]<=0;
@@ -285,8 +288,8 @@ always @ (posedge CLOCK_50) begin
 				outputReg[4] <= 1;
 				outputReg[3] <= 0;
 				outputReg[2] <= 1;
-				outputReg[1] <= buffer2[(sizeBuff2-1)*3+1];
-				outputReg[0] <= buffer2[(sizeBuff2-1)*3+2];
+				outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
+				outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
 			
 				buffer2[(sizeBuff2-1)*3]<=0;
 				buffer2[(sizeBuff2-1)*3+1]<=0;
@@ -301,8 +304,8 @@ always @ (posedge CLOCK_50) begin
 				outputReg[4] <= 1;
 				outputReg[3] <= 1;
 				outputReg[2] <= 0;
-				outputReg[1] <= buffer3[(sizeBuff3-1)*3+1];
-				outputReg[0] <= buffer3[(sizeBuff3-1)*3+2];
+				outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
+				outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
 			
 				buffer3[(sizeBuff3-1)*3]<=0;
 				buffer3[(sizeBuff3-1)*3+1]<=0;
@@ -317,15 +320,16 @@ always @ (posedge CLOCK_50) begin
 
 	end
 	
-	else if (btnStart == 0 && isStartPressed <2) begin
-		inputReg <=0;
+	// Take input
+	else if (btnStart == 0 && isStartPressed <1) begin
+		inputReg=5'b00000;
 		isStartPressed <= isStartPressed+1;
 	end
 	
-	else if (isStartPressed == 2) begin
-
+	else if (isStartPressed == 1) begin
 		case ({btn0,btn1,pressed}) 
 		
+		// No button is pressed
 		3'b111 : begin
 		pressed <= 0 ;
 		end
@@ -341,7 +345,7 @@ always @ (posedge CLOCK_50) begin
 				inputReg[2] = dummy[1];
 				inputReg[1] = dummy[2];
 				inputReg[0] = dummy[3];
-				isStartPressed <= 0 ;
+				isStartPressed <= 0;
 				checkFourValue <= 0;
 				end
 		end
@@ -356,44 +360,49 @@ always @ (posedge CLOCK_50) begin
 				inputReg[3] = dummy[0];
 				inputReg[2] = dummy[1];
 				inputReg[1] = dummy[2];
-				inputReg[0] = dummy[3];	
+				inputReg[0] = dummy[3];
 				isStartPressed <= 0;
-				checkFourValue <= 0;
+				checkFourValue <= 0;	
 			end
 		end
 		endcase		
 	
+		// If 4 bits are done
 		if (inputReg[4] == 1)begin
 			case(inputReg[3:2])
-				// 1st Buffer
+				// 1st Buffer write
 				2'b00:begin
 					buffer1[17:3]=buffer1[14:0];
 					buffer1[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff1 <= sizeBuff1 +1;
 				end
 				
-				// 2nd Buffer
+				// 2nd Buffer write
 				2'b01:begin
 					buffer2[17:3]=buffer2[14:0];
 					buffer2[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff2 <= sizeBuff2 +1;
 				end
 				
-				// 3rd Buffer
+				// 3rd Buffer write
 				2'b10:begin
 					buffer3[17:3]=buffer3[14:0];
 					buffer3[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff3 <= sizeBuff3 +1;
 				end
 				
-				// 4th Buffer
+				// 4th Buffer write
 				2'b11:begin
 					buffer4[17:3]=buffer4[14:0];
 					buffer4[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff4 <= sizeBuff4 +1;
 				end
 			endcase
-			end
+			inputShow<=inputReg;
+			inputReg=5'b00000;
+			isStartPressed <= 0;
+			checkFourValue <= 0;
+		end
 	end 
 	
 end	
@@ -840,7 +849,7 @@ always @(posedge VGA_CLK) begin
 	else if(pos_H>=bPosX4 && pos_H<bPosX4+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
 		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
 		  if(buffer4[15])begin
-				case({buffer4[16],buffer4[17]})
+				case(buffer4[17:16])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
@@ -851,7 +860,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY2 && pos_V<bPosY2+s) begin
 			if(buffer4[12])begin
-				case({buffer4[13],buffer4[14]})
+				case(buffer4[14:13])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
@@ -862,7 +871,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY3 && pos_V<bPosY3+s) begin
 			if(buffer4[9])begin
-				case({buffer4[10],buffer4[11]})
+				case(buffer4[11:10])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
@@ -873,7 +882,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY4 && pos_V<bPosY4+s) begin
 			if(buffer4[6])begin
-			case({buffer4[7],buffer4[8]})
+				case(buffer4[8:7])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
@@ -884,7 +893,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY5 && pos_V<bPosY5+s) begin
 			if(buffer4[3])begin
-				case({buffer4[4],buffer4[5]})
+				case(buffer4[5:4])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
@@ -895,7 +904,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY6 && pos_V<bPosY6+s) begin
 			if(buffer4[0])begin
-				case({buffer4[1],buffer4[2]})
+				case(buffer4[2:1])
 				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
 				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
 				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
@@ -933,8 +942,8 @@ always @(posedge VGA_CLK) begin
 	// Input Reg
    else if (pos_V>=bPosInputY && pos_V<bPosInputY+sizeYNumber && pos_H>=bPosOutX1 && pos_H<bPosOutX4+sizeXNumber)begin
 		if(pos_H>=bPosOutX1 && pos_H<bPosOutX1+sizeXNumber)begin
-			if(inputReg[4]) begin
-				case(inputReg[3])
+			if(inputShow[4]) begin
+				case(inputShow[3])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX1)*sizeYNumber+pos_V-bPosInputY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX1)*sizeYNumber+pos_V-bPosInputY}];
 				endcase
@@ -942,8 +951,8 @@ always @(posedge VGA_CLK) begin
 		end
 		
 		else if(pos_H>=bPosOutX2 && pos_H<bPosOutX2+sizeXNumber)begin
-			if(inputReg[4]) begin
-				case(inputReg[2])
+			if(inputShow[4]) begin
+				case(inputShow[2])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX2)*sizeYNumber+pos_V-bPosInputY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX2)*sizeYNumber+pos_V-bPosInputY}];
 				endcase
@@ -951,8 +960,8 @@ always @(posedge VGA_CLK) begin
 		end
 		
 		else if(pos_H>=bPosOutX3 && pos_H<bPosOutX3+sizeXNumber)begin
-			if(inputReg[4]) begin
-				case(inputReg[1])
+			if(inputShow[4]) begin
+				case(inputShow[1])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX3)*sizeYNumber+pos_V-bPosInputY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX3)*sizeYNumber+pos_V-bPosInputY}];
 				endcase
@@ -960,8 +969,8 @@ always @(posedge VGA_CLK) begin
 		end
 		
 		else if(pos_H>=bPosOutX4 && pos_H<bPosOutX4+sizeXNumber)begin
-			if(inputReg[4]) begin
-				case(inputReg[0])
+			if(inputShow[4]) begin
+				case(inputShow[0])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX4)*sizeYNumber+pos_V-bPosInputY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX4)*sizeYNumber+pos_V-bPosInputY}];
 				endcase
@@ -1011,13 +1020,16 @@ always @(posedge VGA_CLK) begin
 		end
 		
 		else color_i <= 8'h0;
-
 	end
+	// Transmitted Buffer1 Reg
+   /*else if (pos_V>=bPosTransmittedY && pos_V<bPosTransmittedY+sizeYNumber && pos_H>=bPosTransmittedX1 && pos_H<bPosTransmittedX2+sizeXNumber)begin
+		if(pos_H>=bPosTransmittedX1 && pos_H<bPosTransmittedX1+sizeXNumber)begin
+				
 	
-	
-	
+	end
+	*/
 	else begin
-			   color_i <= 8'h0;
+	color_i <= 8'h0;
 	end
 		
 
