@@ -76,6 +76,7 @@ reg[7:0] textBuffer2[0:799];
 reg[7:0] textBuffer3[0:799];
 reg[7:0] textBuffer4[0:799];
 reg[7:0] textBuffer5[0:799];
+reg[7:0] textNames[0:4049];
 
 
 
@@ -160,6 +161,12 @@ parameter bPosBuffer1BCDX10 = 735;
 
 parameter threshold = 3;
 
+parameter sizeNamesX = 135;
+parameter sizeNamesY = 30;
+parameter bPosNamesX = 200;
+parameter bPosNamesY = 450;
+
+
 
 reg [9:0] score1, score2, score3,score4;
 reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
@@ -233,6 +240,8 @@ reg [3:0] droppedCount4BCD1 = 0;
 reg [3:0] droppedCount4BCD2 = 0;
 reg [3:0] droppedCount5BCD1 = 0;
 reg [3:0] droppedCount5BCD2 = 0;
+
+
 
 
 initial begin
@@ -483,6 +492,8 @@ always @ (posedge CLOCK_50) begin
                     transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
 
                 end
+
+                else end
            else begin
                 // Read from Buffer 1
                 if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
@@ -954,6 +965,13 @@ always @(posedge VGA_CLK) begin
 	else if (pos_V>=bPosInputY && pos_V<bPosInputY+sizeInputY && pos_H>=bPosTextInputX && pos_H<bPosTextInputX+sizeInputX)begin
 		color_i <= textInput[{(pos_H-bPosTextInputX)*sizeInputY+pos_V-bPosInputY}];
 	end
+
+	// Names Text
+	else if (pos_V>=bPosNamesY && pos_V<bPosNamesY+sizeNamesY && pos_H>=bPosNamesX && pos_H<bPosTextInputX+sizeNamesX)begin
+		color_i <= textNames[{(pos_H-bPosNamesX)*(sizeNamesY)+(pos_V-bPosNamesY)}];
+	end
+
+
 	
 	// Read Text
 	else if (pos_V>=bPosOutY && pos_V<bPosOutY+sizeInputY && pos_H>=bPosTextInputX && pos_H<bPosTextInputX+sizeInputX)begin
@@ -1614,7 +1632,8 @@ always @(posedge VGA_CLK) begin
 		else if (pos_H>=bPosTextBuffer5X && pos_H<bPosTextBuffer5X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
 			color_i <= textBuffer5[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
 		end
-	
+
+
 	
 	else begin
 	color_i <= 8'h0;

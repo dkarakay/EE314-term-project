@@ -1,11 +1,11 @@
 %read the image
-name = 'totalYellow';
-file_name = append(name,'.jpeg')
+name = 'names';
+file_name = append(name,'.jpg')
 output = append(name,'.txt')
 
 I = imread(file_name);
 size(I)
-I = imresize(I,[20,40]);
+I = imresize(I,[30,135]);
 size(I)
 
 %Extract RED, GREEN and BLUE components from the image
