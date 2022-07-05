@@ -363,24 +363,32 @@ always @ (posedge CLOCK_50) begin
 */
     // Dropped
 
+	 
+	 
     if(sizeBuff1 > 6) begin
         droppedCountBuffer1 <= droppedCountBuffer1 + 1;
-        sizeBuff1 <= sizeBuff1 - 1;
+        sizeBuff1 = sizeBuff1 - 1;
+		  end
     if(sizeBuff2 > 6) begin
         droppedCountBuffer2 <= droppedCountBuffer2 + 1;
-        sizeBuff2 <= sizeBuff2 - 1;
+        sizeBuff2 = sizeBuff2 - 1;
+		  end
     if(sizeBuff3 > 6) begin
         droppedCountBuffer3 <= droppedCountBuffer3 + 1;
-        sizeBuff3 <= sizeBuff3 - 1;
+        sizeBuff3 = sizeBuff3 - 1;
+		  end
     if(sizeBuff4 > 6) begin
         droppedCountBuffer4 <= droppedCountBuffer4 + 1;
-        sizeBuff4 <= sizeBuff4 - 1;
+        sizeBuff4 = sizeBuff4 - 1;
+		  end
+		  
+
     //if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
     //if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
     //if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
 
 
-    droppedCount1BCD1 <= droppedCountBuffer1%10;
+   droppedCount1BCD1 <= droppedCountBuffer1%10;
 	droppedCount1BCD2 <= droppedCountBuffer1/10;
 	droppedCount2BCD1 <= droppedCountBuffer2%10;
 	droppedCount2BCD2 <= droppedCountBuffer2/10;
@@ -400,15 +408,9 @@ always @ (posedge CLOCK_50) begin
 	//if(readNow == 60 && swa)begin
 		outputReg <= 0;
 		
-		if(sizeBuff1 == 0) score1<=0;
-		if(sizeBuff2 == 0) score2<=0;
-		if(sizeBuff3 == 0) score3<=0;
-		if(sizeBuff4 == 0) score4<=0;
-
 		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
 		    if (sizeBuff1 > threshold || sizeBuff1 > threshold || sizeBuff3 > threshold || sizeBuff4 > threshold) begin
-
-		        if(sizeBuff4 >= 5) begin
+					 if(sizeBuff4 >= 5) begin
 		            outputReg[4] <= 1;
                     outputReg[3] <= 1;
                     outputReg[2] <= 1;
@@ -487,7 +489,7 @@ always @ (posedge CLOCK_50) begin
                     transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
 
                 end
-            else begin
+           else begin
                 // Read from Buffer 1
                 if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
                     outputReg[4] <= 1;
@@ -502,7 +504,7 @@ always @ (posedge CLOCK_50) begin
                     sizeBuff1 = sizeBuff1-1;
 
                     transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
-
+					end
                 // Read from Buffer 2
                 else if(sizeBuff2 >= sizeBuff1 && sizeBuff2 >= sizeBuff3 && sizeBuff2 >= sizeBuff4) begin
                     outputReg[4] <= 1;
@@ -550,60 +552,13 @@ always @ (posedge CLOCK_50) begin
                     transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
                 end
 
-                /*
-                // Read from Buffer 1
-                else if(score1 >= score2 && score1 >= score3 && score1 >= score4) begin
-                    outputReg[4] <= 1;
-                    outputReg[3] <= 0;
-                    outputReg[2] <= 0;
-                    outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
-                    outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
-
-                    buffer1[(sizeBuff1-1)*3]<=0;
-                    buffer1[(sizeBuff1-1)*3+1]<=0;
-                    buffer1[(sizeBuff1-1)*3+2]<=0;
-                    sizeBuff1 = sizeBuff1-1;
-
-                    transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
-
-                end
-
-                // Read from Buffer 2
-                else if(score2 >= score1 && score2 >= score3 && score2 >= score4) begin
-                    outputReg[4] <= 1;
-                    outputReg[3] <= 0;
-                    outputReg[2] <= 1;
-                    outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
-                    outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
-
-                    buffer2[(sizeBuff2-1)*3]<=0;
-                    buffer2[(sizeBuff2-1)*3+1]<=0;
-                    buffer2[(sizeBuff2-1)*3+2]<=0;
-                    sizeBuff2 = sizeBuff2-1;
-
-                    transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
-                end
-
-                // Read from Buffer 3
-                else if(score3 >= score1 && score3 >= score2 && score3 >= score4) begin
-                    outputReg[4] <= 1;
-                    outputReg[3] <= 1;
-                    outputReg[2] <= 0;
-                    outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
-                    outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
-
-                    buffer3[(sizeBuff3-1)*3]<=0;
-                    buffer3[(sizeBuff3-1)*3+1]<=0;
-                    buffer3[(sizeBuff3-1)*3+2]<=0;
-                    sizeBuff3 = sizeBuff3-1;
-
-                    transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
-                end
-                */
+                
+           
                 //outputShow<=outputReg;
                 //outputReg<=5'b00000;
 		    end
 		    readNow <= 0;
+			 end
 		end
 	end
 	
