@@ -407,198 +407,203 @@ always @ (posedge CLOCK_50) begin
 
 		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
 		    if (sizeBuff1 > threshold || sizeBuff1 > threshold || sizeBuff3 > threshold || sizeBuff4 > threshold) begin
-			
-			//read1 <= read1 +1;
 
-			/*
-			if(sizeBuff1 > 0) score1 <= sizeBuff1 <=  3 ?  3*sizeBuff1+2*b1Latency+b1Reliability: 3*sizeBuff1+2*b1Reliability+b1Latency; 		
-			if(sizeBuff2 > 0) score2 <= sizeBuff2 <=  3 ?  3*sizeBuff2+2*b2Latency+b2Reliability: 3*sizeBuff2+2*b2Reliability+b2Latency; 		
-			if(sizeBuff3 > 0) score3 <= sizeBuff3 <=  3 ?  3*sizeBuff3+2*b3Latency+b3Reliability: 3*sizeBuff3+2*b3Reliability+b3Latency; 		
-			if(sizeBuff4 > 0) score4 <= sizeBuff4 <=  3 ?  3*sizeBuff4+2*b4Latency+b4Reliability: 3*sizeBuff4+2*b4Reliability+b4Latency; 		
-			*/
+		        if(sizeBuff4 >= 5) begin
+		            outputReg[4] <= 1;
+                    outputReg[3] <= 1;
+                    outputReg[2] <= 1;
+                    outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
+                    outputReg[0] <= buffer4[(sizeBuff4-1)*3+1];
 
-			// Buffer 4
-			if(sizeBuff4 >= sizeBuff1 && sizeBuff4 >= sizeBuff2 && sizeBuff4 >= sizeBuff3) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 1;
-				outputReg[2] <= 1;
-				outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
-				outputReg[0] <= buffer4[(sizeBuff4-1)*3+1];
-			
-				buffer4[(sizeBuff4-1)*3]<=0;
-				buffer4[(sizeBuff4-1)*3+1]<=0;
-				buffer4[(sizeBuff4-1)*3+2]<=0;
-				sizeBuff4 = sizeBuff4-1;
-				
-				transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
-			end
+                    buffer4[(sizeBuff4-1)*3]<=0;
+                    buffer4[(sizeBuff4-1)*3+1]<=0;
+                    buffer4[(sizeBuff4-1)*3+2]<=0;
+                    sizeBuff4 = sizeBuff4-1;
 
-			// Buffer 3
-			else if(sizeBuff3 >= sizeBuff1 && sizeBuff3 >= sizeBuff2 && sizeBuff3 >= sizeBuff4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 1;
-				outputReg[2] <= 0;
-				outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
-				outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
+                    transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
+                end
+                // Buffer 4
+                else if(sizeBuff4 >= sizeBuff1 && sizeBuff4 >= sizeBuff2 && sizeBuff4 >= sizeBuff3) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 1;
+                    outputReg[2] <= 1;
+                    outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
+                    outputReg[0] <= buffer4[(sizeBuff4-1)*3+1];
 
-				buffer4[(sizeBuff4-1)*3]<=0;
-				buffer4[(sizeBuff4-1)*3+1]<=0;
-				buffer4[(sizeBuff4-1)*3+2]<=0;
-				sizeBuff3 = sizeBuff3-1;
+                    buffer4[(sizeBuff4-1)*3]<=0;
+                    buffer4[(sizeBuff4-1)*3+1]<=0;
+                    buffer4[(sizeBuff4-1)*3+2]<=0;
+                    sizeBuff4 = sizeBuff4-1;
 
-				transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
-			end
+                    transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
+                end
 
-			// Read from Buffer 2
-			else if(sizeBuff2 >= sizeBuff1 && sizeBuff2 >= sizeBuff3 && sizeBuff2 >= sizeBuff4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 0;
-				outputReg[2] <= 1;
-				outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
-				outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
+                // Buffer 3
+                else if(sizeBuff3 >= sizeBuff1 && sizeBuff3 >= sizeBuff2 && sizeBuff3 >= sizeBuff4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 1;
+                    outputReg[2] <= 0;
+                    outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
+                    outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
 
-				buffer2[(sizeBuff2-1)*3]<=0;
-				buffer2[(sizeBuff2-1)*3+1]<=0;
-				buffer2[(sizeBuff2-1)*3+2]<=0;
-				sizeBuff2 = sizeBuff2-1;
+                    buffer4[(sizeBuff4-1)*3]<=0;
+                    buffer4[(sizeBuff4-1)*3+1]<=0;
+                    buffer4[(sizeBuff4-1)*3+2]<=0;
+                    sizeBuff3 = sizeBuff3-1;
 
-				transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
-			end
+                    transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
+                end
+
+                // Read from Buffer 2
+                else if(sizeBuff2 >= sizeBuff1 && sizeBuff2 >= sizeBuff3 && sizeBuff2 >= sizeBuff4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 0;
+                    outputReg[2] <= 1;
+                    outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
+                    outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
+
+                    buffer2[(sizeBuff2-1)*3]<=0;
+                    buffer2[(sizeBuff2-1)*3+1]<=0;
+                    buffer2[(sizeBuff2-1)*3+2]<=0;
+                    sizeBuff2 = sizeBuff2-1;
+
+                    transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
+                end
 
 
-			// Read from Buffer 1
-			else if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 0;
-				outputReg[2] <= 0;
-				outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
-				outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
+                // Read from Buffer 1
+                else if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 0;
+                    outputReg[2] <= 0;
+                    outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
+                    outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
 
-				buffer1[(sizeBuff1-1)*3]<=0;
-				buffer1[(sizeBuff1-1)*3+1]<=0;
-				buffer1[(sizeBuff1-1)*3+2]<=0;
-				sizeBuff1 = sizeBuff1-1;
+                    buffer1[(sizeBuff1-1)*3]<=0;
+                    buffer1[(sizeBuff1-1)*3+1]<=0;
+                    buffer1[(sizeBuff1-1)*3+2]<=0;
+                    sizeBuff1 = sizeBuff1-1;
 
-				transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
+                    transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
 
-			end
-		else begin
-		    // Read from Buffer 1
-		    if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 0;
-				outputReg[2] <= 0;
-				outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
-				outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
+                end
+            else begin
+                // Read from Buffer 1
+                if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 0;
+                    outputReg[2] <= 0;
+                    outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
+                    outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
 
-				buffer1[(sizeBuff1-1)*3]<=0;
-				buffer1[(sizeBuff1-1)*3+1]<=0;
-				buffer1[(sizeBuff1-1)*3+2]<=0;
-				sizeBuff1 = sizeBuff1-1;
+                    buffer1[(sizeBuff1-1)*3]<=0;
+                    buffer1[(sizeBuff1-1)*3+1]<=0;
+                    buffer1[(sizeBuff1-1)*3+2]<=0;
+                    sizeBuff1 = sizeBuff1-1;
 
-				transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
+                    transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
 
-            // Read from Buffer 2
-			else if(sizeBuff2 >= sizeBuff1 && sizeBuff2 >= sizeBuff3 && sizeBuff2 >= sizeBuff4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 0;
-				outputReg[2] <= 1;
-				outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
-				outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
+                // Read from Buffer 2
+                else if(sizeBuff2 >= sizeBuff1 && sizeBuff2 >= sizeBuff3 && sizeBuff2 >= sizeBuff4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 0;
+                    outputReg[2] <= 1;
+                    outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
+                    outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
 
-				buffer2[(sizeBuff2-1)*3]<=0;
-				buffer2[(sizeBuff2-1)*3+1]<=0;
-				buffer2[(sizeBuff2-1)*3+2]<=0;
-				sizeBuff2 = sizeBuff2-1;
+                    buffer2[(sizeBuff2-1)*3]<=0;
+                    buffer2[(sizeBuff2-1)*3+1]<=0;
+                    buffer2[(sizeBuff2-1)*3+2]<=0;
+                    sizeBuff2 = sizeBuff2-1;
 
-				transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
-			end
+                    transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
+                end
 
-			// Buffer 3
-			else if(sizeBuff3 >= sizeBuff1 && sizeBuff3 >= sizeBuff2 && sizeBuff3 >= sizeBuff4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 1;
-				outputReg[2] <= 0;
-				outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
-				outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
+                // Buffer 3
+                else if(sizeBuff3 >= sizeBuff1 && sizeBuff3 >= sizeBuff2 && sizeBuff3 >= sizeBuff4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 1;
+                    outputReg[2] <= 0;
+                    outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
+                    outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
 
-				buffer4[(sizeBuff4-1)*3]<=0;
-				buffer4[(sizeBuff4-1)*3+1]<=0;
-				buffer4[(sizeBuff4-1)*3+2]<=0;
-				sizeBuff3 = sizeBuff3-1;
+                    buffer4[(sizeBuff4-1)*3]<=0;
+                    buffer4[(sizeBuff4-1)*3+1]<=0;
+                    buffer4[(sizeBuff4-1)*3+2]<=0;
+                    sizeBuff3 = sizeBuff3-1;
 
-				transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
-			end
+                    transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
+                end
 
-			else if(sizeBuff4 >= sizeBuff1 && sizeBuff4 >= sizeBuff2 && sizeBuff4 >= sizeBuff3) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 1;
-				outputReg[2] <= 1;
-				outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
-				outputReg[0] <= buffer4[(sizeBuff4-1)*3+1];
+                else if(sizeBuff4 >= sizeBuff1 && sizeBuff4 >= sizeBuff2 && sizeBuff4 >= sizeBuff3) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 1;
+                    outputReg[2] <= 1;
+                    outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
+                    outputReg[0] <= buffer4[(sizeBuff4-1)*3+1];
 
-				buffer4[(sizeBuff4-1)*3]<=0;
-				buffer4[(sizeBuff4-1)*3+1]<=0;
-				buffer4[(sizeBuff4-1)*3+2]<=0;
-				sizeBuff4 = sizeBuff4-1;
+                    buffer4[(sizeBuff4-1)*3]<=0;
+                    buffer4[(sizeBuff4-1)*3+1]<=0;
+                    buffer4[(sizeBuff4-1)*3+2]<=0;
+                    sizeBuff4 = sizeBuff4-1;
 
-				transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
-			end
+                    transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
+                end
 
-			/*
-			// Read from Buffer 1
-			else if(score1 >= score2 && score1 >= score3 && score1 >= score4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 0;
-				outputReg[2] <= 0;
-				outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
-				outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
-			
-				buffer1[(sizeBuff1-1)*3]<=0;
-				buffer1[(sizeBuff1-1)*3+1]<=0;
-				buffer1[(sizeBuff1-1)*3+2]<=0;
-				sizeBuff1 = sizeBuff1-1;
-				
-				transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
+                /*
+                // Read from Buffer 1
+                else if(score1 >= score2 && score1 >= score3 && score1 >= score4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 0;
+                    outputReg[2] <= 0;
+                    outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
+                    outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
 
-			end
-					
-			// Read from Buffer 2
-			else if(score2 >= score1 && score2 >= score3 && score2 >= score4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 0;
-				outputReg[2] <= 1;
-				outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
-				outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
-			
-				buffer2[(sizeBuff2-1)*3]<=0;
-				buffer2[(sizeBuff2-1)*3+1]<=0;
-				buffer2[(sizeBuff2-1)*3+2]<=0;
-				sizeBuff2 = sizeBuff2-1;
-				
-				transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
-			end
-			
-			// Read from Buffer 3
-			else if(score3 >= score1 && score3 >= score2 && score3 >= score4) begin
-				outputReg[4] <= 1;
-				outputReg[3] <= 1;
-				outputReg[2] <= 0;
-				outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
-				outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
-			
-				buffer3[(sizeBuff3-1)*3]<=0;
-				buffer3[(sizeBuff3-1)*3+1]<=0;
-				buffer3[(sizeBuff3-1)*3+2]<=0;
-				sizeBuff3 = sizeBuff3-1;
-				
-				transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
-			end
-			*/
-			//outputShow<=outputReg;
-			//outputReg<=5'b00000;
-		end
-		readNow <= 0;
+                    buffer1[(sizeBuff1-1)*3]<=0;
+                    buffer1[(sizeBuff1-1)*3+1]<=0;
+                    buffer1[(sizeBuff1-1)*3+2]<=0;
+                    sizeBuff1 = sizeBuff1-1;
+
+                    transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
+
+                end
+
+                // Read from Buffer 2
+                else if(score2 >= score1 && score2 >= score3 && score2 >= score4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 0;
+                    outputReg[2] <= 1;
+                    outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
+                    outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
+
+                    buffer2[(sizeBuff2-1)*3]<=0;
+                    buffer2[(sizeBuff2-1)*3+1]<=0;
+                    buffer2[(sizeBuff2-1)*3+2]<=0;
+                    sizeBuff2 = sizeBuff2-1;
+
+                    transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
+                end
+
+                // Read from Buffer 3
+                else if(score3 >= score1 && score3 >= score2 && score3 >= score4) begin
+                    outputReg[4] <= 1;
+                    outputReg[3] <= 1;
+                    outputReg[2] <= 0;
+                    outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
+                    outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
+
+                    buffer3[(sizeBuff3-1)*3]<=0;
+                    buffer3[(sizeBuff3-1)*3+1]<=0;
+                    buffer3[(sizeBuff3-1)*3+2]<=0;
+                    sizeBuff3 = sizeBuff3-1;
+
+                    transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
+                end
+                */
+                //outputShow<=outputReg;
+                //outputReg<=5'b00000;
+		    end
+		    readNow <= 0;
 		end
 	end
 	
