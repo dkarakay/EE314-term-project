@@ -178,15 +178,13 @@ integer readNow;
 //reg [13:0] readCountBuffer1;//, readCountBuffer2, readCountBuffer3, readCountBuffer4;
 //wire [15:0] readCount1BCD;
 
-wire [15:0] receivedCount1BCD;
-wire [15:0] receivedCount2BCD;
-wire [15:0] receivedCount3BCD;
-wire [15:0] receivedCount4BCD;
+reg [6:0] receivedCountBuffer1 = 0;
+reg [6:0] receivedCountBuffer2 = 0;
+reg [3:0] receivedCount1BCD1 = 0;
+reg [3:0] receivedCount1BCD2 = 0;
+reg [3:0] receivedCount2BCD1 = 0;
+reg [3:0] receivedCount2BCD2 = 0;
 
-reg [13:0] receivedCountBuffer1;
-reg [13:0] receivedCountBuffer2;
-reg [13:0] receivedCountBuffer3;
-reg [13:0] receivedCountBuffer4;
 
 initial begin
 score1=0;
@@ -250,16 +248,6 @@ $readmemh("ui/buffer/purple1.txt", purple1);
 $readmemh("ui/buffer/purple2.txt", purple2);
 $readmemh("ui/buffer/purple3.txt", purple3);
 
-
-/*
-$readmemh("ui/buffer/b1.txt", b1);
-$readmemh("ui/buffer/b2.txt", b2);
-$readmemh("ui/buffer/b3.txt", b3);
-$readmemh("ui/buffer/b4.txt", b4);
-*/
-
-
-
 $readmemh("ui/numbers/number0.txt", number0);
 $readmemh("ui/numbers/number1.txt", number1);
 $readmemh("ui/numbers/number2.txt", number2);
@@ -280,20 +268,14 @@ end
 
 VGA_SyncS SYNC(.vga_CLK(VGA_CLK), .VSync(VGA_VS), .HSync(VGA_HS), .vga_Ready(READY), .pos_H(pos_H), .pos_V(pos_V));
 
-bin2bcd bcdf(.bin(receivedCountBuffer1), .bcd(receivedCount1BCD));
-bin2bcd bcdf2(.bin(receivedCountBuffer2), .bcd(receivedCount2BCD));
-bin2bcd bcdf3(.bin(receivedCountBuffer3), .bcd(receivedCount3BCD));
-bin2bcd bcdf4(.bin(receivedCountBuffer4), .bcd(receivedCount4BCD));
-
 
 always @ (posedge CLOCK_50) begin
 	//if(swa)
 	readNow <= readNow+1;
 	//else readNow = 0;
 	
-	if(readNow == 75000000)begin
+	if(readNow == 150000000 && swa)begin
 		//readNow = 0;
-		if(swa)begin
 	//if(readNow == 60 && swa)begin
 		outputReg <= 0;
 		
@@ -322,7 +304,7 @@ always @ (posedge CLOCK_50) begin
 				buffer4[(sizeBuff4-1)*3+2]<=0;
 				sizeBuff4 = sizeBuff4-1;
 				
-				//readCountBuffer4 <= readCountBuffer4 +1;
+				//read <= readCountBuffer4 +1;
 			end
 			
 			// Read from Buffer 1
@@ -376,7 +358,6 @@ always @ (posedge CLOCK_50) begin
 			
 			outputShow<=outputReg;
 			outputReg<=5'b00000;
-		end
 		end
 		readNow <= 0;
 	end
@@ -436,6 +417,9 @@ always @ (posedge CLOCK_50) begin
 					buffer1[17:3]=buffer1[14:0];
 					buffer1[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff1 <= sizeBuff1 +1;
+					receivedCountBuffer1 <= receivedCountBuffer1+1;
+					receivedCount1BCD1 <= receivedCountBuffer1%10;
+					receivedCount1BCD2 <= receivedCountBuffer1/10;
 				end
 				
 				// 2nd Buffer write
@@ -443,6 +427,9 @@ always @ (posedge CLOCK_50) begin
 					buffer2[17:3]=buffer2[14:0];
 					buffer2[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff2 <= sizeBuff2 +1;
+					receivedCountBuffer2 <= receivedCountBuffer2+1;
+					receivedCount2BCD1 <= receivedCountBuffer2%10;
+					receivedCount2BCD2 <= receivedCountBuffer2/10;
 				end
 				
 				// 3rd Buffer write
@@ -547,9 +534,8 @@ always @(posedge VGA_CLK) begin
 		else color_i <= 8'h0;
 	end
 	
-	/*
-	// 2nd Buffer Green
-	else if(pos_H>=bPosX2 && pos_H<bPosX2+s)begin
+	// 2nd Buffer Blue
+	else 	if(pos_H>=bPosX2 && pos_H<bPosX2+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
 		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
 		    if(buffer2[15])begin
 				case(buffer2[17:16])
@@ -620,8 +606,8 @@ always @(posedge VGA_CLK) begin
 	end
 	
 	
-	// 3rd Buffer Red
-	else if(pos_H>=bPosX3 && pos_H<bPosX3+s)begin
+	// 3rd Buffer Blue
+	else if(pos_H>=bPosX3 && pos_H<bPosX3+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
 		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
 		   if(buffer3[15])begin
 				case(buffer3[17:16])
@@ -692,10 +678,10 @@ always @(posedge VGA_CLK) begin
 	end
 	
 	// 4th Buffer Purple
-	else if(pos_H>=bPosX4 && pos_H<bPosX4+s)begin
+	else if(pos_H>=bPosX4 && pos_H<bPosX4+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
 		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
 		  if(buffer4[15])begin
-				case({buffer4[16],buffer4[17]})
+				case(buffer4[17:16])
 				2'b00: color_i <= purple0[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
 				2'b01: color_i <= purple1[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
 				2'b10: color_i <= purple2[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
@@ -706,7 +692,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY2 && pos_V<bPosY2+s) begin
 			if(buffer4[12])begin
-				case({buffer4[13],buffer4[14]})
+				case(buffer4[14:13])
 				2'b00: color_i <= purple0[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
 				2'b01: color_i <= purple1[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
 				2'b10: color_i <= purple2[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
@@ -717,7 +703,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY3 && pos_V<bPosY3+s) begin
 			if(buffer4[9])begin
-				case({buffer4[10],buffer4[11]})
+				case(buffer4[11:10])
 				2'b00: color_i <= purple0[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
 				2'b01: color_i <= purple1[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
 				2'b10: color_i <= purple2[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
@@ -728,7 +714,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY4 && pos_V<bPosY4+s) begin
 			if(buffer4[6])begin
-			case({buffer4[7],buffer4[8]})
+				case(buffer4[8:7])
 				2'b00: color_i <= purple0[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
 				2'b01: color_i <= purple1[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
 				2'b10: color_i <= purple2[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
@@ -739,7 +725,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY5 && pos_V<bPosY5+s) begin
 			if(buffer4[3])begin
-				case({buffer4[4],buffer4[5]})
+				case(buffer4[5:4])
 				2'b00: color_i <= purple0[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
 				2'b01: color_i <= purple1[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
 				2'b10: color_i <= purple2[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
@@ -750,7 +736,7 @@ always @(posedge VGA_CLK) begin
 		end
 		else if	(pos_V>=bPosY6 && pos_V<bPosY6+s) begin
 			if(buffer4[0])begin
-				case({buffer4[1],buffer4[2]})
+				case(buffer4[2:1])
 				2'b00: color_i <= purple0[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
 				2'b01: color_i <= purple1[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
 				2'b10: color_i <= purple2[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
@@ -761,234 +747,6 @@ always @(posedge VGA_CLK) begin
 		end
 		else color_i <= 8'h0;
 	end
-	*/
-	
-	// 2nd Buffer Blue
-	else 	if(pos_H>=bPosX2 && pos_H<bPosX2+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
-		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
-		    if(buffer2[15])begin
-				case(buffer2[17:16])
-				2'b00: color_i <= blue0[{(pos_H-bPosX2)*s+pos_V-bPosY1}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX2)*s+pos_V-bPosY1}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX2)*s+pos_V-bPosY1}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX2)*s+pos_V-bPosY1}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX2)*s+pos_V-bPosY1}];
-		end
-		else if	(pos_V>=bPosY2 && pos_V<bPosY2+s) begin
-			if(buffer2[12])begin
-				case(buffer2[14:13])
-				2'b00: color_i <= blue0[{(pos_H-bPosX2)*s+pos_V-bPosY2}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX2)*s+pos_V-bPosY2}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX2)*s+pos_V-bPosY2}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX2)*s+pos_V-bPosY2}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX2)*s+pos_V-bPosY2}];
-		end
-		else if	(pos_V>=bPosY3 && pos_V<bPosY3+s) begin
-			if(buffer2[9])begin
-				case(buffer2[11:10])
-				2'b00: color_i <= blue0[{(pos_H-bPosX2)*s+pos_V-bPosY3}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX2)*s+pos_V-bPosY3}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX2)*s+pos_V-bPosY3}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX2)*s+pos_V-bPosY3}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX2)*s+pos_V-bPosY3}];
-		end
-		else if	(pos_V>=bPosY4 && pos_V<bPosY4+s) begin
-			if(buffer2[6])begin
-				case(buffer2[8:7])
-				2'b00: color_i <= blue0[{(pos_H-bPosX2)*s+pos_V-bPosY4}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX2)*s+pos_V-bPosY4}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX2)*s+pos_V-bPosY4}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX2)*s+pos_V-bPosY4}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX2)*s+pos_V-bPosY4}];
-		end
-		else if	(pos_V>=bPosY5 && pos_V<bPosY5+s) begin
-			if(buffer2[3])begin
-				case(buffer2[5:4])
-				2'b00: color_i <= blue0[{(pos_H-bPosX2)*s+pos_V-bPosY5}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX2)*s+pos_V-bPosY5}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX2)*s+pos_V-bPosY5}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX2)*s+pos_V-bPosY5}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX2)*s+pos_V-bPosY5}];
-		end
-		else if	(pos_V>=bPosY6 && pos_V<bPosY6+s) begin
-			if(buffer2[0])begin
-				case(buffer2[2:1])
-				2'b00: color_i <= blue0[{(pos_H-bPosX2)*s+pos_V-bPosY6}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX2)*s+pos_V-bPosY6}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX2)*s+pos_V-bPosY6}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX2)*s+pos_V-bPosY6}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX2)*s+pos_V-bPosY6}];
-		end
-		else color_i <= 8'h0;
-	end
-	
-	
-	// 3rd Buffer Blue
-	else if(pos_H>=bPosX3 && pos_H<bPosX3+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
-		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
-		   if(buffer3[15])begin
-				case(buffer3[17:16])
-				2'b00: color_i <= blue0[{(pos_H-bPosX3)*s+pos_V-bPosY1}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX3)*s+pos_V-bPosY1}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX3)*s+pos_V-bPosY1}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX3)*s+pos_V-bPosY1}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX3)*s+pos_V-bPosY1}];
-		end
-		else if	(pos_V>=bPosY2 && pos_V<bPosY2+s) begin
-			if(buffer3[12])begin
-				case(buffer3[14:13])
-				2'b00: color_i <= blue0[{(pos_H-bPosX3)*s+pos_V-bPosY2}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX3)*s+pos_V-bPosY2}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX3)*s+pos_V-bPosY2}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX3)*s+pos_V-bPosY2}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX3)*s+pos_V-bPosY2}];
-		end
-		else if	(pos_V>=bPosY3 && pos_V<bPosY3+s) begin
-			if(buffer3[9])begin
-				case(buffer3[11:10])
-				2'b00: color_i <= blue0[{(pos_H-bPosX3)*s+pos_V-bPosY3}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX3)*s+pos_V-bPosY3}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX3)*s+pos_V-bPosY3}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX3)*s+pos_V-bPosY3}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX3)*s+pos_V-bPosY3}];
-		end
-		else if	(pos_V>=bPosY4 && pos_V<bPosY4+s) begin
-			if(buffer3[6])begin
-				case(buffer3[8:7])
-				2'b00: color_i <= blue0[{(pos_H-bPosX3)*s+pos_V-bPosY4}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX3)*s+pos_V-bPosY4}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX3)*s+pos_V-bPosY4}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX3)*s+pos_V-bPosY4}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX3)*s+pos_V-bPosY4}];
-		end
-		else if	(pos_V>=bPosY5 && pos_V<bPosY5+s) begin
-			if(buffer3[3])begin
-				case(buffer3[5:4])
-				2'b00: color_i <= blue0[{(pos_H-bPosX3)*s+pos_V-bPosY5}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX3)*s+pos_V-bPosY5}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX3)*s+pos_V-bPosY5}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX3)*s+pos_V-bPosY5}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX3)*s+pos_V-bPosY5}];
-		end
-		else if	(pos_V>=bPosY6 && pos_V<bPosY6+s) begin
-			if(buffer3[0])begin
-				case(buffer3[2:1])
-				2'b00: color_i <= blue0[{(pos_H-bPosX3)*s+pos_V-bPosY6}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX3)*s+pos_V-bPosY6}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX3)*s+pos_V-bPosY6}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX3)*s+pos_V-bPosY6}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX3)*s+pos_V-bPosY6}];
-		end
-		else color_i <= 8'h0;
-	end
-	
-	// 4th Buffer Purple
-	else if(pos_H>=bPosX4 && pos_H<bPosX4+s && pos_V>=bPosY1 && pos_V<bPosY6+s)begin
-		if	(pos_V>=bPosY1 && pos_V<bPosY1+s)begin
-		  if(buffer4[15])begin
-				case(buffer4[17:16])
-				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX4)*s+pos_V-bPosY1}];
-		end
-		else if	(pos_V>=bPosY2 && pos_V<bPosY2+s) begin
-			if(buffer4[12])begin
-				case(buffer4[14:13])
-				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX4)*s+pos_V-bPosY2}];
-		end
-		else if	(pos_V>=bPosY3 && pos_V<bPosY3+s) begin
-			if(buffer4[9])begin
-				case(buffer4[11:10])
-				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX4)*s+pos_V-bPosY3}];
-		end
-		else if	(pos_V>=bPosY4 && pos_V<bPosY4+s) begin
-			if(buffer4[6])begin
-				case(buffer4[8:7])
-				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
-				endcase
-				end
-			else color_i <= blank[{(pos_H-bPosX4)*s+pos_V-bPosY4}];
-		end
-		else if	(pos_V>=bPosY5 && pos_V<bPosY5+s) begin
-			if(buffer4[3])begin
-				case(buffer4[5:4])
-				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX4)*s+pos_V-bPosY5}];
-		end
-		else if	(pos_V>=bPosY6 && pos_V<bPosY6+s) begin
-			if(buffer4[0])begin
-				case(buffer4[2:1])
-				2'b00: color_i <= blue0[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
-				2'b01: color_i <= blue1[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
-				2'b10: color_i <= blue2[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
-				2'b11: color_i <= blue3[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
-				endcase
-			end
-			else color_i <= blank[{(pos_H-bPosX4)*s+pos_V-bPosY6}];
-		end
-		else color_i <= 8'h0;
-	end
-	
-	
-	
-
-	/*
-	else if(pos_H>=300 && pos_H<360 && pos_V>=80 && pos_V<110)begin
-		color_i <= textInput[{(pos_H-300)*30+pos_V-80}];
-	end
-	
-	else if(pos_H>=400 && pos_H<460 && pos_V>=80 && pos_V<110)begin
-		color_i <= textTransmitted[{(pos_H-400)*30+pos_V-80}];
-	end
-	*/
 	
 	// Input Text
 	else if (pos_V>=bPosInputY && pos_V<bPosInputY+sizeInputY && pos_H>=bPosTextInputX && pos_H<bPosTextInputX+sizeInputX)begin
@@ -1175,33 +933,33 @@ always @(posedge VGA_CLK) begin
 
 		// Buffer1 Text BCD1
 			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
-			    case(receivedCount1BCD[7:4])
-			    4'b0000:color_i <= number0[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0001:color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0010:color_i <= number2[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0011:color_i <= number3[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0100:color_i <= number4[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0101:color_i <= number5[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0110:color_i <= number6[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0111:color_i <= number7[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b1000:color_i <= number8[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b1001:color_i <= number9[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    case(receivedCount2BCD2)
+			    0:color_i <= number0[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    1:color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    2:color_i <= number2[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    3:color_i <= number3[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4:color_i <= number4[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    5:color_i <= number5[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    6:color_i <= number6[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    7:color_i <= number7[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    8:color_i <= number8[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    9:color_i <= number9[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
 			    endcase
 			end
 
 			// Buffer1 Text BCD2
 			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
-				 case(receivedCount1BCD[3:0])
-			    4'b0000:color_i <= number0[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0001:color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0010:color_i <= number2[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0011:color_i <= number3[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0100:color_i <= number4[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0101:color_i <= number5[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0110:color_i <= number6[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b0111:color_i <= number7[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b1000:color_i <= number8[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4'b1001:color_i <= number9[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+				 case(receivedCount2BCD1)
+			    0:color_i <= number0[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    1:color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    2:color_i <= number2[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    3:color_i <= number3[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4:color_i <= number4[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    5:color_i <= number5[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    6:color_i <= number6[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    7:color_i <= number7[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    8:color_i <= number8[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    9:color_i <= number9[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
 			    endcase
 
 			end
@@ -1349,13 +1107,7 @@ always @(posedge VGA_CLK) begin
 	else begin
 	color_i <= 8'h0;
 	end
-		
-
-	
 end
-
-
-
 	assign COLOR = READY ? color_i : 8'h0;
 
 endmodule
