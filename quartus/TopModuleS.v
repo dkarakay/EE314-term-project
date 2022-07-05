@@ -381,7 +381,7 @@ always @ (posedge CLOCK_50) begin
 	droppedCount5BCD1 <= droppedCountBuffer5%10;
 	droppedCount5BCD2 <= droppedCountBuffer5/10;
 
-	*/
+//	*/
 	if(readNow == 150000000 && swa)begin
 		//readNow = 0;
 	//if(readNow == 60 && swa)begin
