@@ -185,7 +185,7 @@ reg pressed;
 integer isStartPressed;
 integer checkFourValue;
 integer data_read;
-integer readNow;
+reg [32:0] readNow =0;
 
 //reg [13:0] readCountBuffer1;//, readCountBuffer2, readCountBuffer3, readCountBuffer4;
 //wire [15:0] readCount1BCD;
@@ -334,8 +334,7 @@ VGA_SyncS SYNC(.vga_CLK(VGA_CLK), .VSync(VGA_VS), .HSync(VGA_HS), .vga_Ready(REA
 
 always @ (posedge CLOCK_50) begin
 	//if(swa)
-	if(swa) readNow = readNow+1;
-		else readNow = 0;
+	
 
 	//else readNow = 0;
 
@@ -405,16 +404,19 @@ always @ (posedge CLOCK_50) begin
 	droppedCount5BCD1 <= droppedCountBuffer5%10;
 	droppedCount5BCD2 <= droppedCountBuffer5/10;
 
+	
+	if (readNow < 75000000) readNow <=readNow+1;
+	if (readNow == 74999999) readNow<=0;
 
-    if(readNow == 150000000 && swa)begin
+   if (readNow == 74999999 && swa)begin
 		//readNow = 0;
 	//if(readNow == 60 && swa)begin
 		outputReg <= 0;
 
 		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
 		    if (sizeBuff1 > threshold || sizeBuff1 > threshold || sizeBuff3 > threshold || sizeBuff4 > threshold) begin
-				if(sizeBuff4 >= 5) begin
-		            outputReg[4] <= 1;
+					 if(sizeBuff4 >= 5) begin
+						  outputReg[4] <= 1;
                     outputReg[3] <= 1;
                     outputReg[2] <= 1;
                     outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
@@ -492,9 +494,9 @@ always @ (posedge CLOCK_50) begin
                     transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
 
                 end
-
-                else end
-           else begin
+			 end
+				
+          else begin
                 // Read from Buffer 1
                 if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
                     outputReg[4] <= 1;
@@ -562,8 +564,8 @@ always @ (posedge CLOCK_50) begin
                 //outputShow<=outputReg;
                 //outputReg<=5'b00000;
 		    end
-		    readNow <= 0;
-			 end
+		   // readNow <= 0;
+			 
 		end
 	end
 
