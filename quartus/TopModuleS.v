@@ -51,9 +51,8 @@ reg[7:0] names[0:1799]; // 90x20
 // 24x15
 reg[7:0] number0[0:359]; 
 reg[7:0] number1[0:359];
-/*
-reg[7:0] number2[0:359];
 
+reg[7:0] number2[0:359];
 reg[7:0] number3[0:359];
 reg[7:0] number4[0:359];
 reg[7:0] number5[0:359];
@@ -61,9 +60,8 @@ reg[7:0] number6[0:359];
 reg[7:0] number7[0:359];
 reg[7:0] number8[0:359];
 reg[7:0] number9[0:359];
-*/
-reg[7:0] numberBlank[0:359];
 
+reg[7:0] numberBlank[0:359];
 
 // transmitted 60x30
 reg[7:0] textTransmitted[0:3199];
@@ -180,10 +178,10 @@ integer readNow;
 //reg [13:0] readCountBuffer1;//, readCountBuffer2, readCountBuffer3, readCountBuffer4;
 //wire [15:0] readCount1BCD;
 
-reg [15:0] receivedCount1BCD;
-reg [15:0] receivedCount2BCD;
-reg [15:0] receivedCount3BCD;
-reg [15:0] receivedCount4BCD;
+wire [15:0] receivedCount1BCD;
+wire [15:0] receivedCount2BCD;
+wire [15:0] receivedCount3BCD;
+wire [15:0] receivedCount4BCD;
 
 reg [13:0] receivedCountBuffer1;
 reg [13:0] receivedCountBuffer2;
@@ -283,9 +281,9 @@ end
 VGA_SyncS SYNC(.vga_CLK(VGA_CLK), .VSync(VGA_VS), .HSync(VGA_HS), .vga_Ready(READY), .pos_H(pos_H), .pos_V(pos_V));
 
 bin2bcd bcdf(.bin(receivedCountBuffer1), .bcd(receivedCount1BCD));
-bin2bcd bcdf(.bin(receivedCountBuffer2), .bcd(receivedCount2BCD));
-bin2bcd bcdf(.bin(receivedCountBuffer3), .bcd(receivedCount3BCD));
-bin2bcd bcdf(.bin(receivedCountBuffer4), .bcd(receivedCount4BCD));
+bin2bcd bcdf2(.bin(receivedCountBuffer2), .bcd(receivedCount2BCD));
+bin2bcd bcdf3(.bin(receivedCountBuffer3), .bcd(receivedCount3BCD));
+bin2bcd bcdf4(.bin(receivedCountBuffer4), .bcd(receivedCount4BCD));
 
 
 always @ (posedge CLOCK_50) begin
@@ -1178,32 +1176,32 @@ always @(posedge VGA_CLK) begin
 		// Buffer1 Text BCD1
 			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
 			    case(receivedCount1BCD[7:4])
-			    4b'0000':color_i <= number0[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0001':color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0010':color_i <= number2[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0011':color_i <= number3[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0100':color_i <= number4[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0101':color_i <= number5[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0110':color_i <= number6[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0111':color_i <= number7[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'1000':color_i <= number8[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'1001':color_i <= number9[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0000:color_i <= number0[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0001:color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0010:color_i <= number2[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0011:color_i <= number3[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0100:color_i <= number4[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0101:color_i <= number5[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0110:color_i <= number6[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0111:color_i <= number7[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b1000:color_i <= number8[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b1001:color_i <= number9[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
 			    endcase
 			end
 
 			// Buffer1 Text BCD2
 			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
 				 case(receivedCount1BCD[3:0])
-			    4b'0000':color_i <= number0[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0001':color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0010':color_i <= number2[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0011':color_i <= number3[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0100':color_i <= number4[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0101':color_i <= number5[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0110':color_i <= number6[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'0111':color_i <= number7[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'1000':color_i <= number8[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
-			    4b'1001':color_i <= number9[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0000:color_i <= number0[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0001:color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0010:color_i <= number2[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0011:color_i <= number3[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0100:color_i <= number4[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0101:color_i <= number5[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0110:color_i <= number6[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b0111:color_i <= number7[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b1000:color_i <= number8[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4'b1001:color_i <= number9[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
 			    endcase
 
 			end
