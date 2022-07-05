@@ -51,3 +51,5 @@ timing
 PLLJ_PLLSPE_INFO.txt # The generated PLL specification file
 
 cyclone2
+
+.idea

@@ -138,8 +138,17 @@ parameter bPosBuffer1BCDX1 = 535;
 parameter bPosBuffer1BCDX2 = 555;
 parameter bPosBuffer1BCDX3 = 580;
 parameter bPosBuffer1BCDX4 = 600;
+parameter bPosBuffer1BCDX5 = 625;
+parameter bPosBuffer1BCDX6 = 645;
+parameter bPosBuffer1BCDX7 = 670;
+parameter bPosBuffer1BCDX8 = 690;
+parameter bPosBuffer1BCDX9 = 715;
+parameter bPosBuffer1BCDX10 = 735;
 
-parameter bPosBuffer1BCDY1 =175;
+
+parameter bPosBuffer1BCDY1 = 175;
+parameter bPosBuffer1BCDY2 = 325;
+parameter bPosBuffer1BCDY3 = 475;
 
 reg [9:0] score1, score2, score3,score4;
 reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
@@ -1066,26 +1075,56 @@ always @(posedge VGA_CLK) begin
 			color_i <= textBuffer1[{(pos_H-bPosTextBuffer1X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
 		end
 		
-			// Buffer1 Text BCD
+			// Buffer1 Text BCD1
 			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
 				color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
 			end
 			
-			// Buffer1 Text BCD
+			// Buffer1 Text BCD2
 			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
 				color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
 			end
 			
-			// Buffer1 Text BCD
+			// Buffer2 Text BCD1
 			else if (pos_H>=bPosBuffer1BCDX3 && pos_H<bPosBuffer1BCDX3+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
 				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
 			end
 			
-			// Buffer1 Text BCD
+			// Buffer2 Text BCD2
 			else if (pos_H>=bPosBuffer1BCDX4 && pos_H<bPosBuffer1BCDX4+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
 				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
 			end
-			
+
+			// Buffer3 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX5 && pos_H<bPosBuffer1BCDX5+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX5)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
+			end
+
+			// Buffer3 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX6 && pos_H<bPosBuffer1BCDX6+sizeXNumber&& pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX6)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
+			end
+
+			// Buffer4 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX7 && pos_H<bPosBuffer1BCDX7+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX7)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
+			end
+
+			// Buffer4 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX8 && pos_H<bPosBuffer1BCDX8+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
+			end
+
+			// Total Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX9 && pos_H<bPosBuffer1BCDX9+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX9)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
+			end
+
+			// Total2 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX10 && pos_H<bPosBuffer1BCDX10+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX10)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
+			end
+
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
 			color_i <= textBuffer1[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
@@ -1116,6 +1155,56 @@ always @(posedge VGA_CLK) begin
 		else if (pos_H>=bPosTextBuffer1X && pos_H<bPosTextBuffer1X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
 			color_i <= textBuffer1[{(pos_H-bPosTextBuffer1X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
 		end
+
+		// Buffer1 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Buffer1 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Buffer2 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX3 && pos_H<bPosBuffer1BCDX3+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Buffer2 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX4 && pos_H<bPosBuffer1BCDX4+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Buffer3 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX5 && pos_H<bPosBuffer1BCDX5+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX5)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Buffer3 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX6 && pos_H<bPosBuffer1BCDX6+sizeXNumber&& pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX6)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Buffer4 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX7 && pos_H<bPosBuffer1BCDX7+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX7)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Buffer4 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX8 && pos_H<bPosBuffer1BCDX8+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Total Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX9 && pos_H<bPosBuffer1BCDX9+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX9)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
+
+			// Total2 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX10 && pos_H<bPosBuffer1BCDX10+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX10)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			end
 			
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
@@ -1146,6 +1235,55 @@ always @(posedge VGA_CLK) begin
 		else if (pos_H>=bPosTextBuffer1X && pos_H<bPosTextBuffer1X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
 			color_i <= textBuffer1[{(pos_H-bPosTextBuffer1X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
 		end
+		// Buffer1 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Buffer1 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Buffer2 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX3 && pos_H<bPosBuffer1BCDX3+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Buffer2 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX4 && pos_H<bPosBuffer1BCDX4+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Buffer3 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX5 && pos_H<bPosBuffer1BCDX5+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX5)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Buffer3 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX6 && pos_H<bPosBuffer1BCDX6+sizeXNumber&& pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= number1[{(pos_H-bPosBuffer1BCDX6)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Buffer4 Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX7 && pos_H<bPosBuffer1BCDX7+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX7)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Buffer4 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX8 && pos_H<bPosBuffer1BCDX8+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Total Text BCD1
+			else if (pos_H>=bPosBuffer1BCDX9 && pos_H<bPosBuffer1BCDX9+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX9)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
+
+			// Total2 Text BCD2
+			else if (pos_H>=bPosBuffer1BCDX10 && pos_H<bPosBuffer1BCDX10+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
+				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX10)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
+			end
 			
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
