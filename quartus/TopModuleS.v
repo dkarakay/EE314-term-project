@@ -335,7 +335,7 @@ always @ (posedge CLOCK_50) begin
 	receivedCount5BCD2 <= receivedCountBuffer5/10;
 
     // Transmitted
-
+/*
 	transmittedCount1BCD1 <= transmittedCountBuffer1%10;
 	transmittedCount1BCD2 <= transmittedCountBuffer1/10;
 	transmittedCount2BCD1 <= transmittedCountBuffer2%10;
@@ -353,9 +353,9 @@ always @ (posedge CLOCK_50) begin
 
     // Dropped
 
-    if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
-    if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
-    if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
+   // if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
+   // if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
+   // if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
 
 
     droppedCount1BCD1 <= droppedCountBuffer1%10;
@@ -372,7 +372,7 @@ always @ (posedge CLOCK_50) begin
 	droppedCount5BCD1 <= droppedCountBuffer5%10;
 	droppedCount5BCD2 <= droppedCountBuffer5/10;
 
-	
+	*/
 	if(readNow == 150000000 && swa)begin
 		//readNow = 0;
 	//if(readNow == 60 && swa)begin
