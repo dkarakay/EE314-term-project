@@ -325,7 +325,9 @@ VGA_SyncS SYNC(.vga_CLK(VGA_CLK), .VSync(VGA_VS), .HSync(VGA_HS), .vga_Ready(REA
 
 always @ (posedge CLOCK_50) begin
 	//if(swa)
-	readNow <= readNow+1;
+	if(readNow < 75000000) readNow <= readNow+1;
+	if (readNow==74999999) readNow<=0;
+
 	//else readNow = 0;
 
 	// Received
@@ -345,7 +347,7 @@ always @ (posedge CLOCK_50) begin
 	receivedCount5BCD2 <= receivedCountBuffer5/10;
 
     // Transmitted
-/*
+
 	transmittedCount1BCD1 <= transmittedCountBuffer1%10;
 	transmittedCount1BCD2 <= transmittedCountBuffer1/10;
 	transmittedCount2BCD1 <= transmittedCountBuffer2%10;
@@ -360,11 +362,9 @@ always @ (posedge CLOCK_50) begin
 
 	transmittedCount5BCD1 <= transmittedCountBuffer5%10;
 	transmittedCount5BCD2 <= transmittedCountBuffer5/10;
-*/
+
     // Dropped
 
-	 
-	 
     if(sizeBuff1 > 6) begin
         droppedCountBuffer1 <= droppedCountBuffer1 + 1;
         sizeBuff1 = sizeBuff1 - 1;
@@ -381,14 +381,8 @@ always @ (posedge CLOCK_50) begin
         droppedCountBuffer4 <= droppedCountBuffer4 + 1;
         sizeBuff4 = sizeBuff4 - 1;
 		  end
-		  
 
-    //if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
-    //if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
-    //if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
-
-
-   droppedCount1BCD1 <= droppedCountBuffer1%10;
+    droppedCount1BCD1 <= droppedCountBuffer1%10;
 	droppedCount1BCD2 <= droppedCountBuffer1/10;
 	droppedCount2BCD1 <= droppedCountBuffer2%10;
 	droppedCount2BCD2 <= droppedCountBuffer2/10;
@@ -402,15 +396,112 @@ always @ (posedge CLOCK_50) begin
 	droppedCount5BCD1 <= droppedCountBuffer5%10;
 	droppedCount5BCD2 <= droppedCountBuffer5/10;
 
-//	*/
-	if(readNow == 150000000 && swa)begin
+
+
+	// Take input
+	if (btnStart == 0 && isStartPressed <2) begin
+		inputReg=5'b00000;
+		isStartPressed <= isStartPressed+1;
+	end
+	
+	else if (isStartPressed == 2) begin
+		case ({btn0,btn1,pressed}) 
+		
+		// No button is pressed
+		3'b111 : begin
+		pressed <= 0 ;
+		end
+		
+		// btn 1
+		3'b010 : begin
+			dummy[checkFourValue] = 0;
+			pressed <= 1 ;
+			checkFourValue <= checkFourValue +1;
+			if(checkFourValue == 3) begin
+				inputReg[4] = 1;
+				inputReg[3] = dummy[0];
+				inputReg[2] = dummy[1];
+				inputReg[1] = dummy[2];
+				inputReg[0] = dummy[3];
+				isStartPressed <= 0;
+				checkFourValue <= 0;
+				end
+		end
+		
+		// btn 0
+		3'b100 :  begin
+			dummy[checkFourValue] = 1;
+			pressed <= 1 ;
+			checkFourValue <= checkFourValue +1;
+			if(checkFourValue == 3) begin
+				inputReg[4] = 1;
+				inputReg[3] = dummy[0];
+				inputReg[2] = dummy[1];
+				inputReg[1] = dummy[2];
+				inputReg[0] = dummy[3];
+				isStartPressed <= 0;
+				checkFourValue <= 0;	
+			end
+		end
+		endcase		
+	
+		// If 4 bits are done
+		if (inputReg[4] == 1)begin
+			case(inputReg[3:2])
+				// 1st Buffer write
+				2'b00:begin
+					buffer1[17:3]=buffer1[14:0];
+					buffer1[2:0] = {inputReg[1:0],1'b1};
+					sizeBuff1 <= sizeBuff1 +1;
+					receivedCountBuffer1 <= receivedCountBuffer1+1;
+					//if(sizeBuff1 > 6) droppedCountBuffer1 <= droppedCountBuffer1 + 1;
+
+				end
+				
+				// 2nd Buffer write
+				2'b01:begin
+					buffer2[17:3]=buffer2[14:0];
+					buffer2[2:0] = {inputReg[1:0],1'b1};
+					sizeBuff2 <= sizeBuff2 +1;
+					receivedCountBuffer2 = receivedCountBuffer2+1;
+					//if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
+
+				end
+				
+				// 3rd Buffer write
+				2'b10:begin
+					buffer3[17:3]=buffer3[14:0];
+					buffer3[2:0] = {inputReg[1:0],1'b1};
+					sizeBuff3 <= sizeBuff3 +1;
+					receivedCountBuffer3 = receivedCountBuffer3+1;
+					//if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
+				end
+				
+				// 4th Buffer write
+				2'b11:begin
+					buffer4[17:3]=buffer4[14:0];
+					buffer4[2:0] = {inputReg[1:0],1'b1};
+					sizeBuff4 <= sizeBuff4 +1;
+					receivedCountBuffer4 = receivedCountBuffer4+1;
+					//if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
+
+				end
+			endcase
+			inputShow<=inputReg;
+			inputReg=5'b00000;
+			isStartPressed <= 0;
+			checkFourValue <= 0;
+		end
+	end
+
+	else if(readNow == 74999999 && swa == 1)begin
 		//readNow = 0;
 	//if(readNow == 60 && swa)begin
 		outputReg <= 0;
-		
+
 		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
 		    if (sizeBuff1 > threshold || sizeBuff1 > threshold || sizeBuff3 > threshold || sizeBuff4 > threshold) begin
-					 if(sizeBuff4 >= 5) begin
+				if(sizeBuff4 >= 5) begin
 		            outputReg[4] <= 1;
                     outputReg[3] <= 1;
                     outputReg[2] <= 1;
@@ -552,111 +643,16 @@ always @ (posedge CLOCK_50) begin
                     transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
                 end
 
-                
-           
+
+
                 //outputShow<=outputReg;
                 //outputReg<=5'b00000;
 		    end
-		    readNow <= 0;
+		    //readNow <= 0;
 			 end
 		end
 	end
-	
-	// Take input
-	else if (btnStart == 0 && isStartPressed <1) begin
-		inputReg=5'b00000;
-		isStartPressed <= isStartPressed+1;
-	end
-	
-	else if (isStartPressed == 1) begin
-		case ({btn0,btn1,pressed}) 
-		
-		// No button is pressed
-		3'b111 : begin
-		pressed <= 0 ;
-		end
-		
-		// btn 1
-		3'b010 : begin
-			dummy[checkFourValue] = 0;
-			pressed <= 1 ;
-			checkFourValue <= checkFourValue +1;
-			if(checkFourValue == 3) begin
-				inputReg[4] = 1;
-				inputReg[3] = dummy[0];
-				inputReg[2] = dummy[1];
-				inputReg[1] = dummy[2];
-				inputReg[0] = dummy[3];
-				isStartPressed <= 0;
-				checkFourValue <= 0;
-				end
-		end
-		
-		// btn 0
-		3'b100 :  begin
-			dummy[checkFourValue] = 1;
-			pressed <= 1 ;
-			checkFourValue <= checkFourValue +1;
-			if(checkFourValue == 3) begin
-				inputReg[4] = 1;
-				inputReg[3] = dummy[0];
-				inputReg[2] = dummy[1];
-				inputReg[1] = dummy[2];
-				inputReg[0] = dummy[3];
-				isStartPressed <= 0;
-				checkFourValue <= 0;	
-			end
-		end
-		endcase		
-	
-		// If 4 bits are done
-		if (inputReg[4] == 1)begin
-			case(inputReg[3:2])
-				// 1st Buffer write
-				2'b00:begin
-					buffer1[17:3]=buffer1[14:0];
-					buffer1[2:0] = {inputReg[1:0],1'b1};
-					sizeBuff1 <= sizeBuff1 +1;
-					receivedCountBuffer1 <= receivedCountBuffer1+1;
-					//if(sizeBuff1 > 6) droppedCountBuffer1 <= droppedCountBuffer1 + 1;
 
-				end
-				
-				// 2nd Buffer write
-				2'b01:begin
-					buffer2[17:3]=buffer2[14:0];
-					buffer2[2:0] = {inputReg[1:0],1'b1};
-					sizeBuff2 <= sizeBuff2 +1;
-					receivedCountBuffer2 = receivedCountBuffer2+1;
-					//if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
-
-				end
-				
-				// 3rd Buffer write
-				2'b10:begin
-					buffer3[17:3]=buffer3[14:0];
-					buffer3[2:0] = {inputReg[1:0],1'b1};
-					sizeBuff3 <= sizeBuff3 +1;
-					receivedCountBuffer3 = receivedCountBuffer3+1;
-					//if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
-				end
-				
-				// 4th Buffer write
-				2'b11:begin
-					buffer4[17:3]=buffer4[14:0];
-					buffer4[2:0] = {inputReg[1:0],1'b1};
-					sizeBuff4 <= sizeBuff4 +1;
-					receivedCountBuffer4 = receivedCountBuffer4+1;
-					//if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
-
-				end
-			endcase
-			inputShow<=inputReg;
-			inputReg=5'b00000;
-			isStartPressed <= 0;
-			checkFourValue <= 0;
-		end
-	end 
 	
 end	
 
