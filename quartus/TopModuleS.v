@@ -73,6 +73,10 @@ reg[7:0] textDropped[0:3199];
 reg[7:0] textInput[0:1799];
 reg[7:0] textRead[0:1799];
 reg[7:0] textBuffer1[0:799];
+reg[7:0] textBuffer2[0:799];
+reg[7:0] textBuffer3[0:799];
+reg[7:0] textBuffer4[0:799];
+reg[7:0] textBuffer5[0:799];
 
 
 
@@ -273,7 +277,12 @@ $readmemh("ui/text/read.txt", textRead);
 $readmemh("ui/text/transmitted.txt", textTransmitted);
 $readmemh("ui/text/dropped.txt", textDropped);
 $readmemh("ui/text/received.txt", textReceived);
+
 $readmemh("ui/text/buffer1.txt", textBuffer1);
+$readmemh("ui/text/buffer2.txt", textBuffer2);
+$readmemh("ui/text/buffer3.txt", textBuffer3);
+$readmemh("ui/text/buffer4.txt", textBuffer4);
+$readmemh("ui/text/buffer5.txt", textBuffer5);
 
 //$readmemh("transmitted.txt", textTransmitted);
 
@@ -350,7 +359,7 @@ always @ (posedge CLOCK_50) begin
 
 	transmittedCount5BCD1 <= transmittedCountBuffer5%10;
 	transmittedCount5BCD2 <= transmittedCountBuffer5/10;
-
+*/
     // Dropped
 
    // if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;

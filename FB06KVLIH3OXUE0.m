@@ -1,5 +1,5 @@
 %read the image
-name = 'buffer1Yellow';
+name = 'totalYellow';
 file_name = append(name,'.jpeg')
 output = append(name,'.txt')
 
