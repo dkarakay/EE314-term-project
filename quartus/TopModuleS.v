@@ -406,10 +406,10 @@ always @ (posedge CLOCK_50) begin
 	droppedCount5BCD2 <= droppedCountBuffer5/10;
 
 	
-	if (readNow < 75000000) readNow <=readNow+1;
-	if (readNow == 74999999) readNow<=0;
+	if (readNow < 150000000) readNow <=readNow+1;
+	if (readNow == 149999999) readNow<=0;
 
-   if (readNow == 74999999 && swa)begin
+   if (readNow == 149999999  && swa)begin
 		//readNow = 0;
 	//if(readNow == 60 && swa)begin
 		outputReg <= 0;
