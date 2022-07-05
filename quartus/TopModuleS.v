@@ -353,7 +353,6 @@ always @ (posedge CLOCK_50) begin
 
     // Dropped
 
-    if(sizeBuff1 > 6) droppedCountBuffer1 <= droppedCountBuffer1 + 1;
     if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
     if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
     if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
@@ -518,6 +517,8 @@ always @ (posedge CLOCK_50) begin
 					buffer1[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff1 <= sizeBuff1 +1;
 					receivedCountBuffer1 <= receivedCountBuffer1+1;
+					if(sizeBuff1 > 6) droppedCountBuffer1 <= droppedCountBuffer1 + 1;
+
 				end
 				
 				// 2nd Buffer write
@@ -526,6 +527,8 @@ always @ (posedge CLOCK_50) begin
 					buffer2[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff2 <= sizeBuff2 +1;
 					receivedCountBuffer2 = receivedCountBuffer2+1;
+					if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
+
 				end
 				
 				// 3rd Buffer write
@@ -533,6 +536,8 @@ always @ (posedge CLOCK_50) begin
 					buffer3[17:3]=buffer3[14:0];
 					buffer3[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff3 <= sizeBuff3 +1;
+					receivedCountBuffer3 = receivedCountBuffer3+1;
+					if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
 				end
 				
 				// 4th Buffer write
@@ -540,6 +545,9 @@ always @ (posedge CLOCK_50) begin
 					buffer4[17:3]=buffer4[14:0];
 					buffer4[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff4 <= sizeBuff4 +1;
+					receivedCountBuffer4 = receivedCountBuffer4+1;
+					if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
+
 				end
 			endcase
 			inputShow<=inputReg;
