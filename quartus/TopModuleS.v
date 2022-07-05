@@ -1,7 +1,7 @@
 module TopModuleS(
 CLOCK_50, VGA_VS, VGA_HS, VGA_CLK,COLOR,
 buffer1,buffer2,buffer3,buffer4,inputShow,btnStart,btn0,btn1,swa,
-outputShow, readCountBuffer1,read1,readCount1BCD
+outputShow,read1
 );
 
 input CLOCK_50;
@@ -22,7 +22,7 @@ reg[7:0] blue1[0:899];
 reg[7:0] blue2[0:899];
 reg[7:0] blue3[0:899];
 
-/*
+
 reg[7:0] green0[0:899];
 reg[7:0] green1[0:899];
 reg[7:0] green2[0:899];
@@ -37,7 +37,7 @@ reg[7:0] purple0[0:899];
 reg[7:0] purple1[0:899];
 reg[7:0] purple2[0:899];
 reg[7:0] purple3[0:899];
-*/
+
 
 reg[7:0] b1[0:899]; // 30x30
 reg[7:0] b2[0:899];
@@ -67,6 +67,11 @@ reg[7:0] numberBlank[0:359];
 
 // transmitted 60x30
 reg[7:0] textTransmitted[0:3199];
+reg[7:0] textReceived[0:3199];
+reg[7:0] textDropped[0:3199];
+
+
+
 reg[7:0] textInput[0:1799];
 reg[7:0] textRead[0:1799];
 reg[7:0] textBuffer1[0:799];
@@ -114,9 +119,8 @@ parameter b2Reliability = 2;
 parameter b3Reliability = 3;
 parameter b4Reliability = 6;
 
-parameter bPosTextLargeY1 = 100;
-parameter bPosTextLargeY2 = 250;
-parameter bPosTextLargeY3 = 400;
+
+
 parameter bPosTextLargeX = 600;
 parameter sTextLargeY = 40;
 parameter sTextLargeX = 80;
@@ -130,9 +134,17 @@ parameter bPosTextBuffer3X = 620;
 parameter bPosTextBuffer4X = 665;
 parameter bPosTextBuffer5X = 710;
 
-parameter bPosTextBuffer1Y = 150;
-parameter bPosTextBuffer2Y = 300;
-parameter bPosTextBuffer3Y = 450;
+parameter bPosTextLargeY1 = 75;
+parameter bPosTextLargeY2 = 225;
+parameter bPosTextLargeY3 = 375;
+
+parameter bPosTextBuffer1Y = 125;
+parameter bPosTextBuffer2Y = 275;
+parameter bPosTextBuffer3Y = 425;
+
+parameter bPosBuffer1BCDY1 = 150;
+parameter bPosBuffer1BCDY2 = 300;
+parameter bPosBuffer1BCDY3 = 450;
 
 parameter bPosBuffer1BCDX1 = 535;
 parameter bPosBuffer1BCDX2 = 555;
@@ -145,10 +157,6 @@ parameter bPosBuffer1BCDX8 = 690;
 parameter bPosBuffer1BCDX9 = 715;
 parameter bPosBuffer1BCDX10 = 735;
 
-
-parameter bPosBuffer1BCDY1 = 175;
-parameter bPosBuffer1BCDY2 = 325;
-parameter bPosBuffer1BCDY3 = 475;
 
 reg [9:0] score1, score2, score3,score4;
 reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
@@ -169,8 +177,18 @@ integer checkFourValue;
 integer data_read;
 integer readNow;
 
-output reg [13:0] readCountBuffer1;//, readCountBuffer2, readCountBuffer3, readCountBuffer4;
-output wire [15:0] readCount1BCD;
+//reg [13:0] readCountBuffer1;//, readCountBuffer2, readCountBuffer3, readCountBuffer4;
+//wire [15:0] readCount1BCD;
+
+reg [15:0] receivedCount1BCD;
+reg [15:0] receivedCount2BCD;
+reg [15:0] receivedCount3BCD;
+reg [15:0] receivedCount4BCD;
+
+reg [13:0] receivedCountBuffer1;
+reg [13:0] receivedCountBuffer2;
+reg [13:0] receivedCountBuffer3;
+reg [13:0] receivedCountBuffer4;
 
 initial begin
 score1=0;
@@ -213,11 +231,11 @@ $readmemh("ui/text/input.txt", textInput);
 $readmemh("ui/text/read.txt", textRead);
 
 $readmemh("ui/text/transmitted.txt", textTransmitted);
+$readmemh("ui/text/dropped.txt", textDropped);
+$readmemh("ui/text/received.txt", textReceived);
 $readmemh("ui/text/buffer1.txt", textBuffer1);
 
 //$readmemh("transmitted.txt", textTransmitted);
-/*
-
 
 $readmemh("ui/buffer/green0.txt", green0);
 $readmemh("ui/buffer/green1.txt", green1);
@@ -233,7 +251,7 @@ $readmemh("ui/buffer/purple0.txt", purple0);
 $readmemh("ui/buffer/purple1.txt", purple1);
 $readmemh("ui/buffer/purple2.txt", purple2);
 $readmemh("ui/buffer/purple3.txt", purple3);
-*/
+
 
 /*
 $readmemh("ui/buffer/b1.txt", b1);
@@ -246,7 +264,6 @@ $readmemh("ui/buffer/b4.txt", b4);
 
 $readmemh("ui/numbers/number0.txt", number0);
 $readmemh("ui/numbers/number1.txt", number1);
-/*
 $readmemh("ui/numbers/number2.txt", number2);
 $readmemh("ui/numbers/number3.txt", number3);
 $readmemh("ui/numbers/number4.txt", number4);
@@ -255,7 +272,6 @@ $readmemh("ui/numbers/number6.txt", number6);
 $readmemh("ui/numbers/number7.txt", number7);
 $readmemh("ui/numbers/number8.txt", number8);
 $readmemh("ui/numbers/number9.txt", number9);
-*/
 $readmemh("ui/numbers/blankNumber.txt", numberBlank);
 
 
@@ -266,7 +282,10 @@ end
 
 VGA_SyncS SYNC(.vga_CLK(VGA_CLK), .VSync(VGA_VS), .HSync(VGA_HS), .vga_Ready(READY), .pos_H(pos_H), .pos_V(pos_V));
 
-bin2bcd bcdf(.bin(readCountBuffer1), .bcd(readCount1BCD));
+bin2bcd bcdf(.bin(receivedCountBuffer1), .bcd(receivedCount1BCD));
+bin2bcd bcdf(.bin(receivedCountBuffer2), .bcd(receivedCount2BCD));
+bin2bcd bcdf(.bin(receivedCountBuffer3), .bcd(receivedCount3BCD));
+bin2bcd bcdf(.bin(receivedCountBuffer4), .bcd(receivedCount4BCD));
 
 
 always @ (posedge CLOCK_50) begin
@@ -321,7 +340,7 @@ always @ (posedge CLOCK_50) begin
 				buffer1[(sizeBuff1-1)*3+2]<=0;
 				sizeBuff1 = sizeBuff1-1;
 				
-				readCountBuffer1 <= readCountBuffer1 +1;
+				//readCountBuffer1 <= readCountBuffer1 +1;
 
 			end
 					
@@ -1148,7 +1167,7 @@ always @(posedge VGA_CLK) begin
 	
 	// Received Reg
 	else if (pos_H>=bPosTextLargeX && pos_H<bPosTextLargeX+sTextLargeX && pos_V>=bPosTextLargeY2 && pos_V<bPosTextLargeY2+sTextLargeY)begin
-		color_i <= textTransmitted[{(pos_H-bPosTextLargeX)*sTextLargeY+pos_V-bPosTextLargeY2}];
+		color_i <= textReceived[{(pos_H-bPosTextLargeX)*sTextLargeY+pos_V-bPosTextLargeY2}];
 	end
 	
 		// Buffer1 Text Reg
@@ -1158,12 +1177,35 @@ always @(posedge VGA_CLK) begin
 
 		// Buffer1 Text BCD1
 			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    case(receivedCount1BCD[7:4])
+			    4b'0000':color_i <= number0[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0001':color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0010':color_i <= number2[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0011':color_i <= number3[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0100':color_i <= number4[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0101':color_i <= number5[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0110':color_i <= number6[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0111':color_i <= number7[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'1000':color_i <= number8[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'1001':color_i <= number9[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    endcase
 			end
 
 			// Buffer1 Text BCD2
 			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY2 && pos_V<bPosBuffer1BCDY2+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+				 case(receivedCount1BCD[3:0])
+			    4b'0000':color_i <= number0[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0001':color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0010':color_i <= number2[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0011':color_i <= number3[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0100':color_i <= number4[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0101':color_i <= number5[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0110':color_i <= number6[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'0111':color_i <= number7[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'1000':color_i <= number8[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    4b'1001':color_i <= number9[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY2}];
+			    endcase
+
 			end
 
 			// Buffer2 Text BCD1
@@ -1226,9 +1268,9 @@ always @(posedge VGA_CLK) begin
 			color_i <= textBuffer1[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
 		end
 	
-	// Received Reg
+	// Dropped Reg
 	else if (pos_H>=bPosTextLargeX && pos_H<bPosTextLargeX+sTextLargeX && pos_V>=bPosTextLargeY3 && pos_V<bPosTextLargeY3+sTextLargeY)begin
-		color_i <= textTransmitted[{(pos_H-bPosTextLargeX)*sTextLargeY+pos_V-bPosTextLargeY3}];
+		color_i <= textDropped[{(pos_H-bPosTextLargeX)*sTextLargeY+pos_V-bPosTextLargeY3}];
 	end
 	
 		// Buffer1 Text Reg
