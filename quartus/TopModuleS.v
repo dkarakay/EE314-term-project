@@ -286,7 +286,8 @@ $readmemh("ui/text/read.txt", textRead);
 
 $readmemh("ui/text/transmitted.txt", textTransmitted);
 $readmemh("ui/text/dropped.txt", textDropped);
-$readmemh("ui/text/received.txt", textReceived);
+$readmemh("ui/text/dropped.txt", textDropped);
+$readmemh("ui/text/names.txt", textNames);
 
 $readmemh("ui/text/buffer1.txt", textBuffer1);
 $readmemh("ui/text/buffer2.txt", textBuffer2);
@@ -415,8 +416,8 @@ always @ (posedge CLOCK_50) begin
 
 		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
 		    if (sizeBuff1 > threshold || sizeBuff1 > threshold || sizeBuff3 > threshold || sizeBuff4 > threshold) begin
-					 if(sizeBuff4 >= 5) begin
-						  outputReg[4] <= 1;
+				if(sizeBuff4 >= 5) begin
+		      		outputReg[4] <= 1;
                     outputReg[3] <= 1;
                     outputReg[2] <= 1;
                     outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
@@ -453,9 +454,9 @@ always @ (posedge CLOCK_50) begin
                     outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
                     outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
 
-                    buffer4[(sizeBuff4-1)*3]<=0;
-                    buffer4[(sizeBuff4-1)*3+1]<=0;
-                    buffer4[(sizeBuff4-1)*3+2]<=0;
+                    buffer3[(sizeBuff3-1)*3]<=0;
+                    buffer3[(sizeBuff3-1)*3+1]<=0;
+                    buffer3[(sizeBuff3-1)*3+2]<=0;
                     sizeBuff3 = sizeBuff3-1;
 
                     transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
@@ -536,9 +537,9 @@ always @ (posedge CLOCK_50) begin
                     outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
                     outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
 
-                    buffer4[(sizeBuff4-1)*3]<=0;
-                    buffer4[(sizeBuff4-1)*3+1]<=0;
-                    buffer4[(sizeBuff4-1)*3+2]<=0;
+                    buffer3[(sizeBuff3-1)*3]<=0;
+                    buffer3[(sizeBuff3-1)*3+1]<=0;
+                    buffer3[(sizeBuff3-1)*3+2]<=0;
                     sizeBuff3 = sizeBuff3-1;
 
                     transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
