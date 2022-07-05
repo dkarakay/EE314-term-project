@@ -1,7 +1,6 @@
 module TopModuleS(
 CLOCK_50, VGA_VS, VGA_HS, VGA_CLK,COLOR,
-buffer1,buffer2,buffer3,buffer4,inputShow,btnStart,btn0,btn1,swa,
-outputShow,read1
+buffer1,buffer2,buffer3,buffer4,inputShow,btnStart,btn0,btn1,swa,read1
 );
 
 input CLOCK_50;
@@ -159,12 +158,14 @@ parameter bPosBuffer1BCDX8 = 690;
 parameter bPosBuffer1BCDX9 = 715;
 parameter bPosBuffer1BCDX10 = 735;
 
+parameter threshold = 3;
+
 
 reg [9:0] score1, score2, score3,score4;
 reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
  
 reg [4:0] inputReg,outputReg;
-output reg [4:0] inputShow,outputShow;
+output reg [4:0] inputShow;
 output reg [4:0] read1;
 
 output reg [18:0] buffer1, buffer2, buffer3, buffer4;
@@ -362,9 +363,21 @@ always @ (posedge CLOCK_50) begin
 */
     // Dropped
 
-   // if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
-   // if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
-   // if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
+    if(sizeBuff1 > 6) begin
+        droppedCountBuffer1 <= droppedCountBuffer1 + 1;
+        sizeBuff1 <= sizeBuff1 - 1;
+    if(sizeBuff2 > 6) begin
+        droppedCountBuffer2 <= droppedCountBuffer2 + 1;
+        sizeBuff2 <= sizeBuff2 - 1;
+    if(sizeBuff3 > 6) begin
+        droppedCountBuffer3 <= droppedCountBuffer3 + 1;
+        sizeBuff3 <= sizeBuff3 - 1;
+    if(sizeBuff4 > 6) begin
+        droppedCountBuffer4 <= droppedCountBuffer4 + 1;
+        sizeBuff4 <= sizeBuff4 - 1;
+    //if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
+    //if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
+    //if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
 
 
     droppedCount1BCD1 <= droppedCountBuffer1%10;
@@ -393,14 +406,19 @@ always @ (posedge CLOCK_50) begin
 		if(sizeBuff4 == 0) score4<=0;
 
 		if(sizeBuff1 > 0 || sizeBuff2 > 0 || sizeBuff3 > 0 || sizeBuff4 > 0) begin
+		    if (sizeBuff1 > threshold || sizeBuff1 > threshold || sizeBuff3 > threshold || sizeBuff4 > threshold) begin
 			
-			read1 <= read1 +1;
+			//read1 <= read1 +1;
+
+			/*
 			if(sizeBuff1 > 0) score1 <= sizeBuff1 <=  3 ?  3*sizeBuff1+2*b1Latency+b1Reliability: 3*sizeBuff1+2*b1Reliability+b1Latency; 		
 			if(sizeBuff2 > 0) score2 <= sizeBuff2 <=  3 ?  3*sizeBuff2+2*b2Latency+b2Reliability: 3*sizeBuff2+2*b2Reliability+b2Latency; 		
 			if(sizeBuff3 > 0) score3 <= sizeBuff3 <=  3 ?  3*sizeBuff3+2*b3Latency+b3Reliability: 3*sizeBuff3+2*b3Reliability+b3Latency; 		
 			if(sizeBuff4 > 0) score4 <= sizeBuff4 <=  3 ?  3*sizeBuff4+2*b4Latency+b4Reliability: 3*sizeBuff4+2*b4Reliability+b4Latency; 		
-			
-			if(score4 >= score1 && score4 >= score2 && score4 >= score3) begin
+			*/
+
+			// Buffer 4
+			if(sizeBuff4 >= sizeBuff1 && sizeBuff4 >= sizeBuff2 && sizeBuff4 >= sizeBuff3) begin
 				outputReg[4] <= 1;
 				outputReg[3] <= 1;
 				outputReg[2] <= 1;
@@ -414,7 +432,120 @@ always @ (posedge CLOCK_50) begin
 				
 				transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
 			end
-			
+
+			// Buffer 3
+			else if(sizeBuff3 >= sizeBuff1 && sizeBuff3 >= sizeBuff2 && sizeBuff3 >= sizeBuff4) begin
+				outputReg[4] <= 1;
+				outputReg[3] <= 1;
+				outputReg[2] <= 0;
+				outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
+				outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
+
+				buffer4[(sizeBuff4-1)*3]<=0;
+				buffer4[(sizeBuff4-1)*3+1]<=0;
+				buffer4[(sizeBuff4-1)*3+2]<=0;
+				sizeBuff3 = sizeBuff3-1;
+
+				transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
+			end
+
+			// Read from Buffer 2
+			else if(sizeBuff2 >= sizeBuff1 && sizeBuff2 >= sizeBuff3 && sizeBuff2 >= sizeBuff4) begin
+				outputReg[4] <= 1;
+				outputReg[3] <= 0;
+				outputReg[2] <= 1;
+				outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
+				outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
+
+				buffer2[(sizeBuff2-1)*3]<=0;
+				buffer2[(sizeBuff2-1)*3+1]<=0;
+				buffer2[(sizeBuff2-1)*3+2]<=0;
+				sizeBuff2 = sizeBuff2-1;
+
+				transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
+			end
+
+
+			// Read from Buffer 1
+			else if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
+				outputReg[4] <= 1;
+				outputReg[3] <= 0;
+				outputReg[2] <= 0;
+				outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
+				outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
+
+				buffer1[(sizeBuff1-1)*3]<=0;
+				buffer1[(sizeBuff1-1)*3+1]<=0;
+				buffer1[(sizeBuff1-1)*3+2]<=0;
+				sizeBuff1 = sizeBuff1-1;
+
+				transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
+
+			end
+		else begin
+		    // Read from Buffer 1
+		    if(sizeBuff1 >= sizeBuff2 && sizeBuff1 >= sizeBuff3 && sizeBuff1 >= sizeBuff4) begin
+				outputReg[4] <= 1;
+				outputReg[3] <= 0;
+				outputReg[2] <= 0;
+				outputReg[1] <= buffer1[(sizeBuff1-1)*3+2];
+				outputReg[0] <= buffer1[(sizeBuff1-1)*3+1];
+
+				buffer1[(sizeBuff1-1)*3]<=0;
+				buffer1[(sizeBuff1-1)*3+1]<=0;
+				buffer1[(sizeBuff1-1)*3+2]<=0;
+				sizeBuff1 = sizeBuff1-1;
+
+				transmittedCountBuffer1 <= transmittedCountBuffer1 +1;
+
+            // Read from Buffer 2
+			else if(sizeBuff2 >= sizeBuff1 && sizeBuff2 >= sizeBuff3 && sizeBuff2 >= sizeBuff4) begin
+				outputReg[4] <= 1;
+				outputReg[3] <= 0;
+				outputReg[2] <= 1;
+				outputReg[1] <= buffer2[(sizeBuff2-1)*3+2];
+				outputReg[0] <= buffer2[(sizeBuff2-1)*3+1];
+
+				buffer2[(sizeBuff2-1)*3]<=0;
+				buffer2[(sizeBuff2-1)*3+1]<=0;
+				buffer2[(sizeBuff2-1)*3+2]<=0;
+				sizeBuff2 = sizeBuff2-1;
+
+				transmittedCountBuffer2 <= transmittedCountBuffer2 +1;
+			end
+
+			// Buffer 3
+			else if(sizeBuff3 >= sizeBuff1 && sizeBuff3 >= sizeBuff2 && sizeBuff3 >= sizeBuff4) begin
+				outputReg[4] <= 1;
+				outputReg[3] <= 1;
+				outputReg[2] <= 0;
+				outputReg[1] <= buffer3[(sizeBuff3-1)*3+2];
+				outputReg[0] <= buffer3[(sizeBuff3-1)*3+1];
+
+				buffer4[(sizeBuff4-1)*3]<=0;
+				buffer4[(sizeBuff4-1)*3+1]<=0;
+				buffer4[(sizeBuff4-1)*3+2]<=0;
+				sizeBuff3 = sizeBuff3-1;
+
+				transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
+			end
+
+			else if(sizeBuff4 >= sizeBuff1 && sizeBuff4 >= sizeBuff2 && sizeBuff4 >= sizeBuff3) begin
+				outputReg[4] <= 1;
+				outputReg[3] <= 1;
+				outputReg[2] <= 1;
+				outputReg[1] <= buffer4[(sizeBuff4-1)*3+2];
+				outputReg[0] <= buffer4[(sizeBuff4-1)*3+1];
+
+				buffer4[(sizeBuff4-1)*3]<=0;
+				buffer4[(sizeBuff4-1)*3+1]<=0;
+				buffer4[(sizeBuff4-1)*3+2]<=0;
+				sizeBuff4 = sizeBuff4-1;
+
+				transmittedCountBuffer4 <= transmittedCountBuffer4 +1;
+			end
+
+			/*
 			// Read from Buffer 1
 			else if(score1 >= score2 && score1 >= score3 && score1 >= score4) begin
 				outputReg[4] <= 1;
@@ -463,11 +594,12 @@ always @ (posedge CLOCK_50) begin
 				
 				transmittedCountBuffer3 <= transmittedCountBuffer3 +1;
 			end
-			
-			outputShow<=outputReg;
-			outputReg<=5'b00000;
+			*/
+			//outputShow<=outputReg;
+			//outputReg<=5'b00000;
 		end
 		readNow <= 0;
+		end
 	end
 	
 	// Take input
@@ -526,7 +658,7 @@ always @ (posedge CLOCK_50) begin
 					buffer1[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff1 <= sizeBuff1 +1;
 					receivedCountBuffer1 <= receivedCountBuffer1+1;
-					if(sizeBuff1 > 6) droppedCountBuffer1 <= droppedCountBuffer1 + 1;
+					//if(sizeBuff1 > 6) droppedCountBuffer1 <= droppedCountBuffer1 + 1;
 
 				end
 				
@@ -536,7 +668,7 @@ always @ (posedge CLOCK_50) begin
 					buffer2[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff2 <= sizeBuff2 +1;
 					receivedCountBuffer2 = receivedCountBuffer2+1;
-					if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
+					//if(sizeBuff2 > 6) droppedCountBuffer2 <= droppedCountBuffer2 + 1;
 
 				end
 				
@@ -546,7 +678,7 @@ always @ (posedge CLOCK_50) begin
 					buffer3[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff3 <= sizeBuff3 +1;
 					receivedCountBuffer3 = receivedCountBuffer3+1;
-					if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
+					//if(sizeBuff3 > 6) droppedCountBuffer3 <= droppedCountBuffer3 + 1;
 				end
 				
 				// 4th Buffer write
@@ -555,7 +687,7 @@ always @ (posedge CLOCK_50) begin
 					buffer4[2:0] = {inputReg[1:0],1'b1};
 					sizeBuff4 <= sizeBuff4 +1;
 					receivedCountBuffer4 = receivedCountBuffer4+1;
-					if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
+					//if(sizeBuff4 > 6) droppedCountBuffer4 <= droppedCountBuffer4 + 1;
 
 				end
 			endcase
@@ -916,8 +1048,8 @@ always @(posedge VGA_CLK) begin
 	// Output Reg
    else if (pos_V>=bPosOutY && pos_V<bPosOutY+sizeYNumber && pos_H>=bPosOutX1 && pos_H<bPosOutX4+sizeXNumber)begin
 		if(pos_H>=bPosOutX1 && pos_H<bPosOutX1+sizeXNumber)begin
-			if(outputShow[4]) begin
-				case(outputShow[3])
+			if(outputReg[4]) begin
+				case(outputReg[3])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX1)*sizeYNumber+pos_V-bPosOutY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX1)*sizeYNumber+pos_V-bPosOutY}];
 				endcase
@@ -925,8 +1057,8 @@ always @(posedge VGA_CLK) begin
 		end
 		
 		else if(pos_H>=bPosOutX2 && pos_H<bPosOutX2+sizeXNumber)begin
-			if(outputShow[4]) begin
-				case(outputShow[2])
+			if(outputReg[4]) begin
+				case(outputReg[2])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX2)*sizeYNumber+pos_V-bPosOutY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX2)*sizeYNumber+pos_V-bPosOutY}];
 				endcase
@@ -934,8 +1066,8 @@ always @(posedge VGA_CLK) begin
 		end
 		
 		else if(pos_H>=bPosOutX3 && pos_H<bPosOutX3+sizeXNumber)begin
-			if(outputShow[4]) begin
-				case(outputShow[1])
+			if(outputReg[4]) begin
+				case(outputReg[1])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX3)*sizeYNumber+pos_V-bPosOutY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX3)*sizeYNumber+pos_V-bPosOutY}];
 				endcase
@@ -943,8 +1075,8 @@ always @(posedge VGA_CLK) begin
 		end
 		
 		else if(pos_H>=bPosOutX4 && pos_H<bPosOutX4+sizeXNumber)begin
-			if(outputShow[4]) begin
-				case(outputShow[0])
+			if(outputReg[4]) begin
+				case(outputReg[0])
 				1'b0: color_i <= number0[{(pos_H-bPosOutX4)*sizeYNumber+pos_V-bPosOutY}];
 				1'b1: color_i <= number1[{(pos_H-bPosOutX4)*sizeYNumber+pos_V-bPosOutY}];
 				endcase
@@ -1123,56 +1255,6 @@ always @(posedge VGA_CLK) begin
 			    endcase
 			end
 
-			/*// Buffer1 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-			
-			// Buffer1 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-			
-			// Buffer2 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX3 && pos_H<bPosBuffer1BCDX3+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-			
-			// Buffer2 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX4 && pos_H<bPosBuffer1BCDX4+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-
-			// Buffer3 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX5 && pos_H<bPosBuffer1BCDX5+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX5)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-
-			// Buffer3 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX6 && pos_H<bPosBuffer1BCDX6+sizeXNumber&& pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX6)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-
-			// Buffer4 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX7 && pos_H<bPosBuffer1BCDX7+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX7)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-
-			// Buffer4 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX8 && pos_H<bPosBuffer1BCDX8+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-
-			// Total Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX9 && pos_H<bPosBuffer1BCDX9+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX9)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-
-			// Total2 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX10 && pos_H<bPosBuffer1BCDX10+sizeXNumber && pos_V>=bPosBuffer1BCDY1 && pos_V<bPosBuffer1BCDY1+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX10)*sizeYNumber+pos_V-bPosBuffer1BCDY1}];
-			end
-*/
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
 			color_i <= textBuffer2[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
@@ -1430,7 +1512,7 @@ always @(posedge VGA_CLK) begin
 
 			// Buffer2 Text BCD1
 			else if (pos_H>=bPosBuffer1BCDX3 && pos_H<bPosBuffer1BCDX3+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				 case(droppedCount2BCD1)
+				 case(droppedCount2BCD2)
                     0:color_i <= number0[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
                     1:color_i <= number1[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
                     2:color_i <= number2[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
@@ -1446,7 +1528,7 @@ always @(posedge VGA_CLK) begin
 
 			// Buffer2 Text BCD2
 			else if (pos_H>=bPosBuffer1BCDX4 && pos_H<bPosBuffer1BCDX4+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				case(droppedCount2BCD2)
+				case(droppedCount2BCD1)
 				    0:color_i <= number0[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
 			        1:color_i <= number1[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
 			        2:color_i <= number2[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
@@ -1510,7 +1592,7 @@ always @(posedge VGA_CLK) begin
 
 			// Buffer4 Text BCD2
 			else if (pos_H>=bPosBuffer1BCDX8 && pos_H<bPosBuffer1BCDX8+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				case(droppedCount4BCD2)
+				case(droppedCount4BCD1)
 				    0:color_i <= number0[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
 			        1:color_i <= number1[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
 			        2:color_i <= number2[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
@@ -1555,57 +1637,7 @@ always @(posedge VGA_CLK) begin
 			        9:color_i <= number9[{(pos_H-bPosBuffer1BCDX10)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
 			    endcase
 			end
-		/*
-		// Buffer1 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX1 && pos_H<bPosBuffer1BCDX1+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX1)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
 
-			// Buffer1 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX2 && pos_H<bPosBuffer1BCDX2+sizeXNumber&& pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX2)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Buffer2 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX3 && pos_H<bPosBuffer1BCDX3+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX3)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Buffer2 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX4 && pos_H<bPosBuffer1BCDX4+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX4)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Buffer3 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX5 && pos_H<bPosBuffer1BCDX5+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX5)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Buffer3 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX6 && pos_H<bPosBuffer1BCDX6+sizeXNumber&& pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= number1[{(pos_H-bPosBuffer1BCDX6)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Buffer4 Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX7 && pos_H<bPosBuffer1BCDX7+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX7)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Buffer4 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX8 && pos_H<bPosBuffer1BCDX8+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX8)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Total Text BCD1
-			else if (pos_H>=bPosBuffer1BCDX9 && pos_H<bPosBuffer1BCDX9+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX9)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-
-			// Total2 Text BCD2
-			else if (pos_H>=bPosBuffer1BCDX10 && pos_H<bPosBuffer1BCDX10+sizeXNumber && pos_V>=bPosBuffer1BCDY3 && pos_V<bPosBuffer1BCDY3+sizeYNumber)begin
-				color_i <= numberBlank[{(pos_H-bPosBuffer1BCDX10)*sizeYNumber+pos_V-bPosBuffer1BCDY3}];
-			end
-			*/
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
 			color_i <= textBuffer2[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
