@@ -1175,22 +1175,22 @@ always @(posedge VGA_CLK) begin
 */
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+			color_i <= textBuffer2[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
 		end
 		
 		// Buffer3 Text Reg
 		else if (pos_H>=bPosTextBuffer3X && pos_H<bPosTextBuffer3X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+			color_i <= textBuffer3[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
 		end
 		
 		// Buffer4 Text Reg	
 		else if (pos_H>=bPosTextBuffer4X && pos_H<bPosTextBuffer4X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+			color_i <= textBuffer4[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
 		end
 		
 		// Buffer5 Text Reg
 		else if (pos_H>=bPosTextBuffer5X && pos_H<bPosTextBuffer5X+sTextBufferX && pos_V>=bPosTextBuffer1Y && pos_V<bPosTextBuffer1Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
+			color_i <= textBuffer5[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer1Y}];
 		end
 		
 	
@@ -1367,22 +1367,22 @@ always @(posedge VGA_CLK) begin
 			
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+			color_i <= textBuffer2[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
 		end
 		
 		// Buffer3 Text Reg
 		else if (pos_H>=bPosTextBuffer3X && pos_H<bPosTextBuffer3X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+			color_i <= textBuffer3[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
 		end
 		
 		// Buffer4 Text Reg	
 		else if (pos_H>=bPosTextBuffer4X && pos_H<bPosTextBuffer4X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+			color_i <= textBuffer4[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
 		end
 		
 		// Buffer5 Text Reg
 		else if (pos_H>=bPosTextBuffer5X && pos_H<bPosTextBuffer5X+sTextBufferX && pos_V>=bPosTextBuffer2Y && pos_V<bPosTextBuffer2Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
+			color_i <= textBuffer5[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer2Y}];
 		end
 	
 	// Dropped Reg
@@ -1608,22 +1608,22 @@ always @(posedge VGA_CLK) begin
 			*/
 		// Buffer2 Text Reg
 		else if (pos_H>=bPosTextBuffer2X && pos_H<bPosTextBuffer2X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+			color_i <= textBuffer2[{(pos_H-bPosTextBuffer2X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
 		end
 		
 		// Buffer3 Text Reg
 		else if (pos_H>=bPosTextBuffer3X && pos_H<bPosTextBuffer3X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+			color_i <= textBuffer3[{(pos_H-bPosTextBuffer3X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
 		end
 		
 		// Buffer4 Text Reg	
 		else if (pos_H>=bPosTextBuffer4X && pos_H<bPosTextBuffer4X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+			color_i <= textBuffer4[{(pos_H-bPosTextBuffer4X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
 		end
 		
 		// Buffer5 Text Reg
 		else if (pos_H>=bPosTextBuffer5X && pos_H<bPosTextBuffer5X+sTextBufferX && pos_V>=bPosTextBuffer3Y && pos_V<bPosTextBuffer3Y+sTextBufferY)begin
-			color_i <= textBuffer1[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
+			color_i <= textBuffer5[{(pos_H-bPosTextBuffer5X)*sTextBufferY+pos_V-bPosTextBuffer3Y}];
 		end
 	
 	
