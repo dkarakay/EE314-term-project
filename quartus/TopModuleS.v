@@ -1,6 +1,6 @@
 module TopModuleS(
 CLOCK_50, VGA_VS, VGA_HS, VGA_CLK,COLOR,
-buffer1,buffer2,buffer3,buffer4,inputShow,btnStart,btn0,btn1,swa,read1
+buffer1,buffer2,buffer3,buffer4,inputShow,btnStart,btn0,btn1,swa
 );
 
 input CLOCK_50;
@@ -173,7 +173,6 @@ reg [2:0] sizeBuff1, sizeBuff2, sizeBuff3,sizeBuff4;
  
 reg [4:0] inputReg,outputReg;
 output reg [4:0] inputShow;
-output reg [4:0] read1;
 
 output reg [18:0] buffer1, buffer2, buffer3, buffer4;
 input btnStart,btn0,btn1,swa;
@@ -285,7 +284,7 @@ $readmemh("ui/text/input.txt", textInput);
 $readmemh("ui/text/read.txt", textRead);
 
 $readmemh("ui/text/transmitted.txt", textTransmitted);
-$readmemh("ui/text/dropped.txt", textDropped);
+$readmemh("ui/text/received.txt", textReceived);
 $readmemh("ui/text/dropped.txt", textDropped);
 $readmemh("ui/text/names.txt", textNames);
 
@@ -294,8 +293,6 @@ $readmemh("ui/text/buffer2.txt", textBuffer2);
 $readmemh("ui/text/buffer3.txt", textBuffer3);
 $readmemh("ui/text/buffer4.txt", textBuffer4);
 $readmemh("ui/text/buffer5.txt", textBuffer5);
-
-//$readmemh("transmitted.txt", textTransmitted);
 
 $readmemh("ui/buffer/green0.txt", green0);
 $readmemh("ui/buffer/green1.txt", green1);
