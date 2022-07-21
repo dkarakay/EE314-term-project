@@ -24,3 +24,5 @@ You are going to implement your project on the FPGA boards that you will borrow 
 - Deniz Karakay
 - Ömer Özer
 - Mustafa Yılmaz
+
+[The Last Verilog](https://github.com/dkarakay/314-project/blob/main/images/last-verilog.jpeg)
